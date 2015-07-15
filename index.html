@@ -284,7 +284,8 @@ var compatibility = [[1, type12, type13, type14],
                      [type13, type23, 1, type34],
                      [type14, type24, type34, 1]];
 
-var type = ["type0", "type1"];
+var typea = "type0";
+var typeb = "type1";
 
 var svg = d3.select("#demoarea")
               .append("svg")
@@ -382,21 +383,21 @@ svg.append("defs").selectAll("marker")
     .attr("d", "M0,-5L10,0L0,5");
 
 function buttonpress1() {
-  type[0] = d3.select(this).attr("class");
+  typea = d3.select(this).attr("class");
   buttons1.attr("stroke-width", 1)
           .attr("opacity", .3);
   d3.select(this).attr("stroke-width", 3)
                  .attr("opacity", .9);
-  console.log(type);
+  console.log([typea, typeb]);
 }
 
 function buttonpress2() {
-  type[1] = d3.select(this).attr("class");
+  typeb = d3.select(this).attr("class");
   buttons2.attr("stroke-width", 1)
           .attr("opacity", .3);
   d3.select(this).attr("stroke-width", 3)
                  .attr("opacity", .9);
-  console.log(type);
+  console.log([typea, typeb]);
 }
 
 function inArray (array, point) {
@@ -421,19 +422,19 @@ function addPoint() {
     return;
   }
   vertices.push(point);
-  verticesType.push(type);
-  console.log(verticesType);
+  verticesType.push([typea, typeb]);
+  console.log('added type', verticesType);
   pointsG.append("circle")
          .attr("cx", point[0] - delta)
          .attr("cy", point[1])
-         .attr("class", type[0])
+         .attr("class", typea)
          .attr("opacity", .5)
          .attr("r", 15);
 
   pointsG.append("circle")
          .attr("cx", point[0] + delta)
          .attr("cy", point[1])
-         .attr("class", type[1])
+         .attr("class", typeb)
          .attr("opacity", .5)
          .attr("r", 15);
 }
@@ -495,13 +496,18 @@ function serverResponse(error, data) {
           links = []
           for (var i = 0; i < solution.length; i++) {
             cycle = solution[i];
+            console.log(cycle);
             for (var j = 0; j < cycle.length - 1; j++) {
-              links.push({source: cycle[j], target: cycle[j+1], type: "type0"})
+              links.push({source: cycle[j], target: cycle[j+1],
+                         type: verticesType[cycle[j]][0]});
+              console.log(verticesType[cycle[j]]);
             }
-            links.push({source: cycle[cycle.length-1], target: cycle[0], type: "type0"})
+            links.push({source: cycle[cycle.length-1], target: cycle[0],
+                       type: verticesType[cycle[cycle.length-1]][0]});
+            console.log(verticesType[cycle[cycle.length-1]]);
           }
-          console.log(links)
-
+          console.log('links', links);
+          console.log('verticesType', verticesType)
           solutionG.selectAll("path").remove("path");
 
           // Draw the cycles
