@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script>
+  MathJax.Hub.Config({
+                      tex2jax: {inlineMath: [['$', '$'], ['\\(','\\)']]},
+                      TeX: { equationNumbers: {autoNumber: "AMS"} },
+                      "HTML-CSS": { showMathMenu: false,
+                                    scale: 90 }
+
+                     });
+</script>
+<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css">
+<style>
+
+@import url(http://fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
+@import url(http://fonts.googleapis.com/css?family=Lato);
+html {
+   min-width: 1040px;
+}
+
+body {
+   background: #fcfcfa;
+   color: #333;
+   font-family: "PT Serif", serif;
+   /*margin: 0 1em 4em auto;*/
+   position: relative;
+   width: 960px;
+   left: 13em;
+}
+
+h1, h2, h3, h4 { font-family: "Lato", "PT Serif", serif; color: #000; text-rendering: optimizeLegibility; }
+
+h1 {
+  font-size: 64px;
+  line-height: 73px;
+  font-weight: 900;
+  margin-top: 0.67em;
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+}
+
+h2 {
+   margin-top: 2em;
+}
+
+subtitle {
+   display:block;
+   font-family: "PT Serif", serif;
+   font-size: 32px;
+   font-style: italic;
+   font-weight: 100;
+}
+
+p {
+  line-height: 150%;
+  width: 720px;
+}
+
+a {
+  color: steelblue;
+  cursor: auto;
+}
+
+a:not(:hover) {
+   text-decoration: none;
+}
+
+pre {
+   border-left: solid 2px #ccc;
+   padding-left: 18px;
+   margin: 2em 0 2em -20px;
+}
+
+aside {
+   font-size: small;
+   right: 0;
+   position: absolute;
+   width: 180px;
+}
+
+#nav {
+        left: 5px;
+        font-family: "Lato", serif;
+        font-weight: 700;
+        list-style: none;
+        margin: 0;
+        position: fixed;
+        top: 10px;
+        box-sizing: border-box;
+}
+
+
+#nav li {
+        margin-bottom: 0px;
+}
+
+#nav a {
+        color: #333;
+        display: block;
+        font-size: 14px;
+        border-left: 3px solid #fcfcfa;
+        padding: 5px 10px;
+        text-decoration: none;
+}
+
+#nav a:hover {
+   border-left: 3px solid steelblue;
+}
+
+#nav .current a {
+   border-left: 3px solid steelblue;
+}
+
+.type0 {
+  fill: red;
+}
+
+.type1 {
+  fill: blue;
+}
+
+.type2 {
+  fill: green;
+}
+
+.type3 {
+  fill: yellow;
+}
+
+</style>
+<body>
+  <ul id="nav">
+    <li class="current"><a href="#intro">Intro</a></li>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#model">Model</a></li>
+    <li><a href="#implementation">Implementation</a></li>
+    <li><a href="#demo">Live Demo</a></li>
+  </ul>
+  <div id="container">
+    <div class="section" id="intro">
+      <h1>Kidney Exchange</h1>
+        <subtitle>with integer programming and Gurobi</subtitle>
+    </div>
+
+    <div class="section" id="problem">
+      <h2><a href="#problem" name="problem">Problem Description</a></h2>
+      Problem description goes here
+      <p>
+      </p>
+    </div>
+    <div class="section" id="model">
+      <h2><a href="#model" name="model">Mathematical Model</a></h2>
+
+      <p>Model description goes here.</p>
+
+    </div>
+    <div class="section" id="implementation">
+      <h2><a href="#implementation" name="implementation">Implementation</a></h2>
+      <p>Below is the full implementation of the model (and the associated data) in
+        Gurobi's Python interface:
+      </p>
+      <pre>
+      from gurobipy import *
+
+      vertices  = range(5)
+      edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
+                (0,4) : 1, (4,0) : 1, (1,4) : 1, (4,1) : 1,
+                (1,3) : 1, (3,1) : 1, (2,3) : 1, (3,2) : 1,
+                (3,4) : 1, (4,3) : 1 }
+
+      def twoCycle(vertices, edges):
+          '''
+          Returns a dictionary of 2 cycles. Keys: (u,v), Value: weight of cycle
+          Note that u < v to not double count cycles.
+          '''
+          twoCycles = {}
+          for edge in edges:
+              u = edge[0]
+              v = edge[1]
+              if (u < v and (v,u) in edges):
+                  twoCycles[(u,v)] = edges[(u,v)] + edges[(v,u)]
+          return twoCycles
+
+      def threeCycle(vertices, edges):
+          '''
+          Returns a dictionary of 3 cycles. Keys: (u,w,v), Value: weight of cycle
+          Note that w is always the lowest numbered vertex to not double
+          (or triple) count cycles.
+          '''
+          threeCycles = {}
+          for edge in edges:
+              u = edge[0]
+              v = edge[1]
+              for w in vertices:
+                  if (w >= u or w >= v ):
+                      break
+                  if ( (u,w) in edges and (w,v) in edges ):
+                      threeCycles[(u,w,v)] = edges[(u,v)] + edges[(u,w)] + edges[(w,v)]
+          return threeCycles
+
+      twoCycles = twoCycle(vertices,edges)
+      threeCycles = threeCycle(vertices,edges)
+
+      m = Model()
+
+      c = {}
+
+      for cycle in twoCycles:
+          c[cycle] = m.addVar(vtype=GRB.BINARY, name="c_%s" % str(cycle))
+
+      for cycle in threeCycles:
+          c[cycle] = m.addVar(vtype=GRB.BINARY, name="c_%s" % str(cycle))
+
+      m.update()
+
+      for v in vertices:
+          constraint = 0
+          for cycle in c:
+              if (v in cycle):
+                  constraint = constraint + c[cycle]
+          m.addConstr( constraint <= 1 , name="v%d" % v)
+
+      m.setObjective( quicksum( c[cycle] * twoCycles[cycle] for cycle in twoCycles ) +
+                      quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
+                      GRB.MAXIMIZE )
+
+      m.optimize()
+      </pre>
+    </div>
+    <div class="section" id="demo">
+      <h2><a href="#demo" name="demo">Live Demo</a></h2>
+
+
+      <div id="demoarea">
+      </div>
+      <button class="pure-button" onclick="compute()">Compute</button>
+    </div>
+
+    <div style="min-height:100px"></div>
+<!--[if gt IE 8]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script><!--<![endif]-->
+<script src="http://davist11.github.io/jQuery-One-Page-Nav/jquery.nav.js"></script>
+<script>
+  $(document).ready(function() {
+  console.log('calling onePageNav');
+  $('#nav').onePageNav();
+  });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script>
+
+//Width, height and button width
+var width = 800;
+var height = 550;
+var bw = width/10;
+var menu = 80;
+var delta = 10;
+var type12 = .5, type13 = .2, type14 = 0;
+var type23 = 0, type24 = .7;
+var type34 = .6;
+var compatibility = [[1, type12, type13, type14],
+                     [type12, 1, type23, type24],
+                     [type13, type23, 1, type34],
+                     [type14, type24, type34, 1]];
+
+var type = ["type0", "type1"];
+
+var svg = d3.select("#demoarea")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height);
+
+var backgroundG = svg.append("g");
+backgroundG.append("rect")
+           .attr("x", 0)
+           .attr("y", menu)
+           .attr("width", width)
+           .attr("height", height - menu)
+           .attr("fill", "rgb(183,224,255)")
+           .on("mousedown", addPoint);
+
+// Initial points
+var vertices = [];
+var verticesType = [];
+
+var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
+var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
+
+// G object for points
+var pointsG = svg.append("g");
+
+// G object for solution
+var solutionG = svg.append("g");
+
+// G objects for buttons
+var buttonsG1 = svg.append("g");
+var buttonsG2 = svg.append("g");
+
+// Create graphics related to buttons
+buttonsG1.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", menu)
+        .attr("fill", "gray")
+        .attr("opacity", .5)
+        .attr("stroke", "black");
+
+buttonsG1.append("text")
+        .attr("x", width/4)
+        .attr("y", 25)
+        .text("DONOR");
+
+buttonsG1.append("text")
+        .attr("x", 3*width/4)
+        .attr("y", 25)
+        .text("ACCEPTOR");
+
+buttonsG1.selectAll("text")
+       .attr("font-size", "25px")
+       .attr("fill", "white")
+       .attr("text-anchor", "middle");
+
+var buttons1 = buttonsG1.selectAll("circle")
+                      .data(buttondata1)
+                      .enter()
+                      .append("circle")
+                      .attr("cx", function(d) { return d; })
+                      .attr("cy", 55)
+                      .attr("r", 15)
+                      .attr("class", function(d,i) { return "type" + i % 4 ; })
+                      .attr("opacity", .3)
+                      .attr("stroke", "black")
+                      .on("mousedown", buttonpress1);
+
+var buttons2 = buttonsG2.selectAll("circle")
+                      .data(buttondata2)
+                      .enter()
+                      .append("circle")
+                      .attr("cx", function(d) { return d; })
+                      .attr("cy", 55)
+                      .attr("r", 15)
+                      .attr("class", function(d,i) { return "type" + i % 4 ; })
+                      .attr("opacity", .3)
+                      .attr("stroke", "black")
+                      .on("mousedown", buttonpress2);
+
+function buttonpress1() {
+  type[0] = d3.select(this).attr("class");
+  buttons1.attr("stroke-width", 1)
+          .attr("opacity", .3);
+  d3.select(this).attr("stroke-width", 3)
+                 .attr("opacity", .9);
+  console.log(type);
+}
+
+function buttonpress2() {
+  type[1] = d3.select(this).attr("class");
+  buttons2.attr("stroke-width", 1)
+          .attr("opacity", .3);
+  d3.select(this).attr("stroke-width", 3)
+                 .attr("opacity", .9);
+  console.log(type);
+}
+
+function inArray (array, point) {
+  var p0 = point[0];
+  var p1 = point[1];
+  var bool = false;
+  for (i = 0; i < array.length; i++) {
+    pointprime = array[i];
+    if (p0 === pointprime[0] && p1 === pointprime[1]) {
+      bool = true;
+      break;
+    }
+  }
+  return bool;
+}
+
+function addPoint() {
+  var point = d3.mouse(this);
+  console.log(point)
+  if (inArray(vertices, point)) {
+    console.log('point already exists!');
+    return;
+  }
+  vertices.push(point);
+  verticesType.push(type);
+  console.log(verticesType);
+  pointsG.append("circle")
+         .attr("cx", point[0] - delta)
+         .attr("cy", point[1])
+         .attr("class", type[0])
+         .attr("opacity", .5)
+         .attr("r", 15);
+
+  pointsG.append("circle")
+         .attr("cx", point[0] + delta)
+         .attr("cy", point[1])
+         .attr("class", type[1])
+         .attr("opacity", .5)
+         .attr("r", 15);
+}
+
+function compute() {
+  var nodes = [];
+  var edges = { 1 : [], 0.5 : [], 0.2 : [],
+                0.7 : [], 0.6 : []};
+
+  for (var i = 0; i < verticesType.length; i++) { // Iterate over donors
+    nodes.push(i);
+    for (var j = 0; j < verticesType.length; j++) { // Iterate over acceptors
+      if (i !== j) {
+        var node1 = verticesType[i][0].charAt(4);
+        var node2 = verticesType[j][1].charAt(4);
+        node1 = parseInt(node1);
+        node2 = parseInt(node2);
+        var edgeweight = compatibility[node1][node2];
+        console.log('edgeweight', edgeweight);
+        if (edgeweight !== 0) {
+          edges[edgeweight].push([i,j]);
+        }
+      }
+    }
+  }
+  console.log('nodes', nodes);
+  console.log('edges', edges);
+
+  d3.json('/kidneyExchange')
+    .header('Content-Type', 'application/json')
+    .post(JSON.stringify({'nodes': nodes,
+                          'edges': edges}), serverResponse);
+}
+
+function serverResponse(error, data) {
+   console.log('serverResponse');
+   console.log('data', data);
+   if (!error) {
+      if ('solution' in data) {
+          // Import solution and put it into correct format
+          var solution = data['solution'];
+          console.log('solution', solution)
+
+
+      }
+   }
+}
+</script>
