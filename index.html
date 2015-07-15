@@ -130,6 +130,12 @@ aside {
   fill: yellow;
 }
 
+.link.type0 {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
+}
+
 </style>
 <body>
   <ul id="nav">
@@ -348,6 +354,20 @@ var buttons2 = buttonsG2.selectAll("circle")
                       .attr("stroke", "black")
                       .on("mousedown", buttonpress2);
 
+// Add markers to create arrows
+svg.append("defs").selectAll("marker")
+    .data(["type0", "type1", "type2", "type3"])
+    .enter().append("marker")
+    .attr("id", function(d) { return d; })
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 15)
+    .attr("refY", -1.5)
+    .attr("markerWidth", 6)
+    .attr("markerHeight", 6)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5");
+
 function buttonpress1() {
   type[0] = d3.select(this).attr("class");
   buttons1.attr("stroke-width", 1)
@@ -405,6 +425,15 @@ function addPoint() {
          .attr("r", 15);
 }
 
+function linkArc(d) {
+  var source = vertices[d.source];
+  var target = vertices[d.target];
+  var dx = target[0] - source[0],
+      dy = target[1] - source[1],
+      dr = Math.sqrt(dx * dx + dy * dy);
+  return "M" + source[0] + "," + source[1] + "A" + dr + "," + dr + " 0 0,1 " + target[0] + "," + target[1];
+}
+
 function compute() {
   var nodes = [];
   var edges = { 1 : [], 0.5 : [], 0.2 : [],
@@ -440,11 +469,28 @@ function serverResponse(error, data) {
    console.log('data', data);
    if (!error) {
       if ('solution' in data) {
-          // Import solution and put it into correct format
           var solution = data['solution'];
           console.log('solution', solution)
+          links = []
+          for (var i = 0; i < solution.length; i++) {
+            cycle = solution[i];
+            for (var j = 0; j < cycle.length - 1; j++) {
+              links.push({source: cycle[j], target: cycle[j+1], type: "type0"})
+            }
+            links.push({source: cycle[cycle.length-1], target: cycle[0], type: "type0"})
+          }
+          console.log(links)
 
-
+          // Draw the cycles
+          var path = solutionG.selectAll("path")
+                    .data(links)
+                    .enter()
+                    .append("path")
+                    //.attr("class", function(d) { return "link " + d.type;})
+                    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; })
+                    .attr("d", function(d) { return linkArc(d); })
+                    .attr("fill", "none")
+                    .attr("stroke", "black");
       }
    }
 }
