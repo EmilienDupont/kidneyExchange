@@ -130,10 +130,20 @@ aside {
   fill: yellow;
 }
 
-.link.type0 {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
+.link.type0c {
+  stroke: red;
+}
+
+.link.type1c {
+  stroke: blue;
+}
+
+.link.type2c {
+  stroke: green;
+}
+
+.link.type3c {
+  stroke: yellow;
 }
 
 </style>
@@ -264,6 +274,8 @@ var height = 550;
 var bw = width/10;
 var menu = 80;
 var delta = 10;
+
+// Compatibility matrix between different donors and acceptors
 var type12 = .5, type13 = .2, type14 = 0;
 var type23 = 0, type24 = .7;
 var type34 = .6;
@@ -360,11 +372,12 @@ svg.append("defs").selectAll("marker")
     .enter().append("marker")
     .attr("id", function(d) { return d; })
     .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 15)
-    .attr("refY", -1.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
+    .attr("refX", 0)
+    .attr("refY", 0)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
     .attr("orient", "auto")
+    .attr("class", function(d) { return d; })
     .append("path")
     .attr("d", "M0,-5L10,0L0,5");
 
@@ -439,6 +452,8 @@ function compute() {
   var edges = { 1 : [], 0.5 : [], 0.2 : [],
                 0.7 : [], 0.6 : []};
 
+  var nonzeros = 0;
+
   for (var i = 0; i < verticesType.length; i++) { // Iterate over donors
     nodes.push(i);
     for (var j = 0; j < verticesType.length; j++) { // Iterate over acceptors
@@ -451,12 +466,18 @@ function compute() {
         console.log('edgeweight', edgeweight);
         if (edgeweight !== 0) {
           edges[edgeweight].push([i,j]);
+          nonzeros = 1;
         }
       }
     }
   }
   console.log('nodes', nodes);
   console.log('edges', edges);
+
+  if (nonzeros === 0) {
+    console.log("No compatible acceptor donor pairs!");
+    return;
+  }
 
   d3.json('/kidneyExchange')
     .header('Content-Type', 'application/json')
@@ -481,16 +502,19 @@ function serverResponse(error, data) {
           }
           console.log(links)
 
+          solutionG.selectAll("path").remove("path");
+
           // Draw the cycles
-          var path = solutionG.selectAll("path")
+          var cycles = solutionG.selectAll("path")
                     .data(links)
                     .enter()
                     .append("path")
-                    //.attr("class", function(d) { return "link " + d.type;})
+                    .attr("class", function(d) { return "link " + d.type + "c";})
                     .attr("marker-end", function(d) { return "url(#" + d.type + ")"; })
                     .attr("d", function(d) { return linkArc(d); })
                     .attr("fill", "none")
-                    .attr("stroke", "black");
+                    .attr("stroke-opacity", .7)
+                    .attr("stroke-width", 3);
       }
    }
 }
