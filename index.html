@@ -626,9 +626,7 @@ function linkArc(d) {
   var dx = target[0] - source[0],
       dy = target[1] - source[1],
       dr = Math.sqrt(dx * dx + dy * dy);
-  var sourceDx = source[0] + 0.02*(centerx - source[0]);
-  var sourceDy = source[1] + 0.02*(centery - source[1]);
-  return "M" + sourceDx + "," + sourceDy + "A" + dr + "," + dr + " 0 0,1 " + target[0] + "," + target[1];
+  return "M" + source[0] + "," + source[1] + "A" + dr + "," + dr + " 0 0,1 " + target[0] + "," + target[1];
 }
 
 function compute() {
