@@ -270,10 +270,13 @@ aside {
 
 //Width, height and button width
 var width = 800;
-var height = 550;
+var height = 650;
 var bw = width/10;
 var menu = 80;
 var delta = 10;
+var radius = 250;
+var numCircles = 10;
+var circleSize = 27;
 
 // Compatibility matrix between different donors and acceptors
 var type12 = .5, type13 = .2, type14 = 0;
@@ -284,9 +287,11 @@ var compatibility = [[1, type12, type13, type14],
                      [type13, type23, 1, type34],
                      [type14, type24, type34, 1]];
 
+// Initial types
 var typea = "type0";
 var typeb = "type1";
 
+// Graphics
 var svg = d3.select("#demoarea")
               .append("svg")
               .attr("width", width)
@@ -298,7 +303,28 @@ backgroundG.append("rect")
            .attr("y", menu)
            .attr("width", width)
            .attr("height", height - menu)
-           .attr("fill", "rgb(183,224,255)")
+           .attr("fill", "black")
+           .attr("opacity", .1);
+
+// Create buttons on a circle
+var positions = [];
+for (var i = 0; i < numCircles; i++) {
+  var angle = 2*Math.PI*i/(numCircles);
+  positions.push([ width/2 + radius * Math.cos(angle),  (height+menu)/2 + radius * Math.sin(angle)]);
+}
+
+backgroundG.selectAll("circle")
+           .data(positions)
+           .enter()
+           .append("circle")
+           .attr("cx", function(d) { return d[0]; })
+           .attr("cy", function(d) { return d[1]; })
+           .attr("r", circleSize)
+           .attr("stroke", "black")
+           .attr("stroke-width", 3)
+           .attr("stroke-opacity", 1)
+           .attr("fill", "black")
+           .attr("opacity", .5)
            .on("mousedown", addPoint);
 
 // Initial points
@@ -324,7 +350,7 @@ buttonsG1.append("rect")
         .attr("y", 0)
         .attr("width", width)
         .attr("height", menu)
-        .attr("fill", "gray")
+        .attr("fill", "black")
         .attr("opacity", .5)
         .attr("stroke", "black");
 
@@ -382,6 +408,87 @@ svg.append("defs").selectAll("marker")
     .append("path")
     .attr("d", "M0,-5L10,0L0,5");
 
+// Different color gradients for the half circles
+var grad00 = svg.append("defs").append("linearGradient").attr("id", "grad00")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad00.append("stop").attr("offset", "50%").style("stop-color", "red");
+grad00.append("stop").attr("offset", "50%").style("stop-color", "red");
+var grad01 = svg.append("defs").append("linearGradient").attr("id", "grad01")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad01.append("stop").attr("offset", "50%").style("stop-color", "red");
+grad01.append("stop").attr("offset", "50%").style("stop-color", "blue");
+var grad02 = svg.append("defs").append("linearGradient").attr("id", "grad02")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad02.append("stop").attr("offset", "50%").style("stop-color", "red");
+grad02.append("stop").attr("offset", "50%").style("stop-color", "green");
+var grad03 = svg.append("defs").append("linearGradient").attr("id", "grad03")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad03.append("stop").attr("offset", "50%").style("stop-color", "red");
+grad03.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+var grad10 = svg.append("defs").append("linearGradient").attr("id", "grad10")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad10.append("stop").attr("offset", "50%").style("stop-color", "blue");
+grad10.append("stop").attr("offset", "50%").style("stop-color", "red");
+var grad11 = svg.append("defs").append("linearGradient").attr("id", "grad11")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad11.append("stop").attr("offset", "50%").style("stop-color", "blue");
+grad11.append("stop").attr("offset", "50%").style("stop-color", "blue");
+var grad12 = svg.append("defs").append("linearGradient").attr("id", "grad12")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad12.append("stop").attr("offset", "50%").style("stop-color", "blue");
+grad12.append("stop").attr("offset", "50%").style("stop-color", "green");
+var grad13 = svg.append("defs").append("linearGradient").attr("id", "grad13")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad13.append("stop").attr("offset", "50%").style("stop-color", "blue");
+grad13.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+var grad20 = svg.append("defs").append("linearGradient").attr("id", "grad20")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad20.append("stop").attr("offset", "50%").style("stop-color", "green");
+grad20.append("stop").attr("offset", "50%").style("stop-color", "red");
+var grad21 = svg.append("defs").append("linearGradient").attr("id", "grad21")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad21.append("stop").attr("offset", "50%").style("stop-color", "green");
+grad21.append("stop").attr("offset", "50%").style("stop-color", "blue");
+var grad22 = svg.append("defs").append("linearGradient").attr("id", "grad22")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad22.append("stop").attr("offset", "50%").style("stop-color", "green");
+grad22.append("stop").attr("offset", "50%").style("stop-color", "green");
+var grad23 = svg.append("defs").append("linearGradient").attr("id", "grad23")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad23.append("stop").attr("offset", "50%").style("stop-color", "green");
+grad23.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+var grad30 = svg.append("defs").append("linearGradient").attr("id", "grad30")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad30.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+grad30.append("stop").attr("offset", "50%").style("stop-color", "red");
+var grad31 = svg.append("defs").append("linearGradient").attr("id", "grad31")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad31.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+grad31.append("stop").attr("offset", "50%").style("stop-color", "blue");
+var grad32 = svg.append("defs").append("linearGradient").attr("id", "grad32")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad32.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+grad32.append("stop").attr("offset", "50%").style("stop-color", "green");
+var grad33 = svg.append("defs").append("linearGradient").attr("id", "grad33")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+
+/* Note you should probably use Arcs for the half circles instead
+  var vis = d3.select("body").append("svg")
+var pi = Math.PI;
+
+var arc = d3.svg.arc()
+    .innerRadius(50)
+    .outerRadius(70)
+    .startAngle(45 * (pi/180)) //converting from degs to radians
+    .endAngle(3) //just radians
+
+vis.append("path")
+    .attr("d", arc)
+    .attr("transform", "translate(50,50)")
+ */
+
 function buttonpress1() {
   typea = d3.select(this).attr("class");
   buttons1.attr("stroke-width", 1)
@@ -400,43 +507,62 @@ function buttonpress2() {
   console.log([typea, typeb]);
 }
 
-function inArray (array, point) {
+function indexArray (array, point) {
   var p0 = point[0];
   var p1 = point[1];
   var bool = false;
+  var index = -1;
   for (i = 0; i < array.length; i++) {
     pointprime = array[i];
     if (p0 === pointprime[0] && p1 === pointprime[1]) {
       bool = true;
+      index = i;
       break;
     }
   }
-  return bool;
+  return [bool,index];
 }
 
 function addPoint() {
-  var point = d3.mouse(this);
-  console.log(point)
-  if (inArray(vertices, point)) {
-    console.log('point already exists!');
-    return;
-  }
-  vertices.push(point);
-  verticesType.push([typea, typeb]);
-  console.log('added type', verticesType);
-  pointsG.append("circle")
-         .attr("cx", point[0] - delta)
-         .attr("cy", point[1])
-         .attr("class", typea)
-         .attr("opacity", .5)
-         .attr("r", 15);
+  var point = [0,0];
+  point[0] = d3.select(this).attr("cx");
+  point[1] = d3.select(this).attr("cy");
 
-  pointsG.append("circle")
-         .attr("cx", point[0] + delta)
-         .attr("cy", point[1])
-         .attr("class", typeb)
-         .attr("opacity", .5)
-         .attr("r", 15);
+  if (typea === "type0" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad00)"); }
+  if (typea === "type0" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad01)"); }
+  if (typea === "type0" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad02)"); }
+  if (typea === "type0" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad03)"); }
+  if (typea === "type1" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad10)"); }
+  if (typea === "type1" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad11)"); }
+  if (typea === "type1" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad12)"); }
+  if (typea === "type1" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad13)"); }
+  if (typea === "type2" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad20)"); }
+  if (typea === "type2" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad21)"); }
+  if (typea === "type2" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad22)"); }
+  if (typea === "type2" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad23)"); }
+  if (typea === "type3" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad30)"); }
+  if (typea === "type3" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad31)"); }
+  if (typea === "type3" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad32)"); }
+  if (typea === "type3" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad33)"); }
+  // Here what we want is that when circle is clicked:
+  // Remove the thing that is currently there and add the new circles
+  // Have an array where you keep track of where shiz is. Maybe we can give
+  // a class to each circle you can click? Then you can check if thing is a class
+  // and then add or remove it from vertices and verticesTypes
+  // Want an array like [0,0,1,0,1,1,0,0,1] for selected circles
+  console.log(point)
+  var check = indexArray(vertices, point);
+  if (check[0]) {
+    console.log('point already exists!');
+    verticesType[check[1]] = [typea,typeb];
+    return;
+  } else {
+    vertices.push(point);
+    verticesType.push([typea, typeb]);
+  }
+
+  console.log('verticesType', verticesType);
+  console.log('vertices', vertices)
 }
 
 function linkArc(d) {
