@@ -130,20 +130,49 @@ aside {
   fill: yellow;
 }
 
-.link.type0c {
-  stroke: red;
+.link.arrow0 {
+  stroke: #f7fcb9;
+  fill: none;
 }
 
-.link.type1c {
-  stroke: blue;
+.link.arrow1 {
+  stroke: #addd8e;
+  fill: none;
 }
 
-.link.type2c {
-  stroke: green;
+.link.arrow2 {
+  stroke: #31a354;
+  fill: none;
 }
 
-.link.type3c {
-  stroke: yellow;
+.link.arrow3 {
+  stroke: #ffffcc;
+  fill: none;
+}
+
+.link.arrow4 {
+  stroke: #c2e699;
+  fill: none;
+}
+
+.arrow0 {
+  fill: #f7fcb9;
+}
+
+.arrow1 {
+  fill: #addd8e;
+}
+
+.arrow2 {
+  fill: #31a354;
+}
+
+.arrow3 {
+  fill: #ffffcc;
+}
+
+.arrow4 {
+  fill: #c2e699;
 }
 
 </style>
@@ -233,11 +262,12 @@ aside {
       m.update()
 
       for v in vertices:
-          constraint = 0
-          for cycle in c:
-              if (v in cycle):
-                  constraint = constraint + c[cycle]
-          m.addConstr( constraint <= 1 , name="v%d" % v)
+        constraint = []
+        for cycle in c:
+            if (v in cycle):
+                constraint.append(c[cycle])
+        if constraint:
+            m.addConstr( quicksum( constraint[i] for i in range(len(constraint)) ) <= 1 , name="v%d" % v)
 
       m.setObjective( quicksum( c[cycle] * twoCycles[cycle] for cycle in twoCycles ) +
                       quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
@@ -275,6 +305,8 @@ var bw = width/10;
 var menu = 80;
 var delta = 10;
 var radius = 250;
+var centerx = width/2;
+var centery = (height+menu)/2;
 var numCircles = 10;
 var circleSize = 27;
 
@@ -310,7 +342,7 @@ backgroundG.append("rect")
 var positions = [];
 for (var i = 0; i < numCircles; i++) {
   var angle = 2*Math.PI*i/(numCircles);
-  positions.push([ width/2 + radius * Math.cos(angle),  (height+menu)/2 + radius * Math.sin(angle)]);
+  positions.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
 }
 
 backgroundG.selectAll("circle")
@@ -330,6 +362,7 @@ backgroundG.selectAll("circle")
 // Initial points
 var vertices = [];
 var verticesType = [];
+var verticesInner = []; // positions arrows are going to point to
 
 var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
 var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
@@ -395,7 +428,7 @@ var buttons2 = buttonsG2.selectAll("circle")
 
 // Add markers to create arrows
 svg.append("defs").selectAll("marker")
-    .data(["type0", "type1", "type2", "type3"])
+    .data(["arrow0", "arrow1", "arrow2", "arrow3", "arrow4"])
     .enter().append("marker")
     .attr("id", function(d) { return d; })
     .attr("viewBox", "0 -5 10 10")
@@ -544,12 +577,7 @@ function addPoint() {
   if (typea === "type3" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad31)"); }
   if (typea === "type3" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad32)"); }
   if (typea === "type3" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad33)"); }
-  // Here what we want is that when circle is clicked:
-  // Remove the thing that is currently there and add the new circles
-  // Have an array where you keep track of where shiz is. Maybe we can give
-  // a class to each circle you can click? Then you can check if thing is a class
-  // and then add or remove it from vertices and verticesTypes
-  // Want an array like [0,0,1,0,1,1,0,0,1] for selected circles
+
   console.log(point)
   var check = indexArray(vertices, point);
   if (check[0]) {
@@ -559,6 +587,9 @@ function addPoint() {
   } else {
     vertices.push(point);
     verticesType.push([typea, typeb]);
+    var innerx = parseFloat(point[0]) + 0.2*(centerx - parseFloat(point[0]));
+    var innery = parseFloat(point[1]) + 0.2*(centery - parseFloat(point[1]));
+    verticesInner.push([innerx, innery]);
   }
 
   console.log('verticesType', verticesType);
@@ -566,12 +597,17 @@ function addPoint() {
 }
 
 function linkArc(d) {
-  var source = vertices[d.source];
-  var target = vertices[d.target];
+  var source = verticesInner[d.source];
+  var target = verticesInner[d.target];
+  console.log('in link arc');
+  console.log(source);
+  console.log(verticesInner[d.source]);
   var dx = target[0] - source[0],
       dy = target[1] - source[1],
       dr = Math.sqrt(dx * dx + dy * dy);
-  return "M" + source[0] + "," + source[1] + "A" + dr + "," + dr + " 0 0,1 " + target[0] + "," + target[1];
+  var sourceDx = source[0] + 0.02*(centerx - source[0]);
+  var sourceDy = source[1] + 0.02*(centery - source[1]);
+  return "M" + sourceDx + "," + sourceDy + "A" + dr + "," + dr + " 0 0,1 " + target[0] + "," + target[1];
 }
 
 function compute() {
@@ -623,13 +659,14 @@ function serverResponse(error, data) {
           for (var i = 0; i < solution.length; i++) {
             cycle = solution[i];
             console.log(cycle);
+            var arrowType = "arrow" + String(i);
             for (var j = 0; j < cycle.length - 1; j++) {
               links.push({source: cycle[j], target: cycle[j+1],
-                         type: verticesType[cycle[j]][0]});
+                         type: arrowType});
               console.log(verticesType[cycle[j]]);
             }
             links.push({source: cycle[cycle.length-1], target: cycle[0],
-                       type: verticesType[cycle[cycle.length-1]][0]});
+                       type: arrowType});
             console.log(verticesType[cycle[cycle.length-1]]);
           }
           console.log('links', links);
@@ -641,10 +678,9 @@ function serverResponse(error, data) {
                     .data(links)
                     .enter()
                     .append("path")
-                    .attr("class", function(d) { return "link " + d.type + "c";})
-                    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; })
+                    .attr("class", function(d) { return "link " + d.type;})
+                    .attr("marker-end", function(d) { return "url(#" + d.type + ")"; }) // Note that # refers to the id of the object
                     .attr("d", function(d) { return linkArc(d); })
-                    .attr("fill", "none")
                     .attr("stroke-opacity", .7)
                     .attr("stroke-width", 3);
       }

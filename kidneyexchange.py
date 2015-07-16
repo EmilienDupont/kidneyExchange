@@ -56,11 +56,12 @@ def optimize(vertices, edges):
     m.update()
 
     for v in vertices:
-        constraint = 0
+        constraint = []
         for cycle in c:
             if (v in cycle):
-                constraint = constraint + c[cycle]
-        m.addConstr( constraint <= 1 , name="v%d" % v)
+                constraint.append(c[cycle])
+        if constraint:
+            m.addConstr( quicksum( constraint[i] for i in range(len(constraint)) ) <= 1 , name="v%d" % v)
 
     m.setObjective( quicksum( c[cycle] * twoCycles[cycle] for cycle in twoCycles ) +
                     quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
