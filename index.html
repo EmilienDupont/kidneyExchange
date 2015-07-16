@@ -194,6 +194,7 @@ aside {
       <h2><a href="#problem" name="problem">Problem Description</a></h2>
       Problem description goes here
       <p>
+        Kidney exchange is an example of more general Barter Exchange Market problem.
       </p>
     </div>
     <div class="section" id="model">
@@ -201,6 +202,41 @@ aside {
 
       <p>Model description goes here.</p>
 
+      <p> Let $G$ be a graph where the set of vertices $V$ corresponds to acceptor/donor pairs
+      and the set of directed weighted edges $E$ represent a compatibility factor between a donor and an acceptor. </p>
+
+      <p> Let $C$ be the set of cycles in the graph of length at most 3. Let $w_c$ denote the weight of
+      the cycle, which is the sum of the edge weights in the cycle. Our goal is to find a cycle cover
+      of the graph with maximum weight. Therefore we define a binary variable $c$ for each cycle
+      such that
+      \[
+      c = \left\{\begin{array}{ll}
+             1 & \text{if cycle is in the cover}\\
+             0 & \mathrm{otherwise}
+            \end{array}\right.
+      \]
+      </p>
+      <p> The objective we seek to maximize is the total weight of the cover, i.e.
+      \[
+      \text{cycle cover weight} = \sum_{c \in C} w_c c
+      \]</p>
+      <p> Now since an acceptor only needs to receive one kidney and a donor can at most give one kidney,
+    each vertex of the vertex the graph can be in at most one cycle. We therefore find all the cycles in which
+    a given vertex $v$ is included. To impose the constraint, the sum of these binary variables can at most be one.
+    So we have the set of constraints (one for each vertex $v$)
+    \[
+    \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
+    \]
+      </p>
+      <p> So finally we have
+       \[
+      \begin{array}{ll}
+      \text{maximize} & \sum_{c \in C} w_c c \\
+      \text{subject to} & \sum_{c : v \in c} c \leq 1 \quad \forall v \in V \\
+                        & c \in \{ 0, 1 \} \quad \forall c \in C
+      \end{array}
+      \]
+      </p>
     </div>
     <div class="section" id="implementation">
       <h2><a href="#implementation" name="implementation">Implementation</a></h2>
@@ -279,7 +315,8 @@ aside {
     <div class="section" id="demo">
       <h2><a href="#demo" name="demo">Live Demo</a></h2>
 
-
+      <p> Click on the buttons at the top to change the type of acceptor/donor pairs. Click
+      on the circles to add/change pairs. Click compute to compute the optimal kidney exchange. </p>
       <div id="demoarea">
       </div>
       <button class="pure-button" onclick="compute()">Compute</button>
@@ -581,6 +618,8 @@ function addPoint() {
   var point = [0,0];
   point[0] = d3.select(this).attr("cx");
   point[1] = d3.select(this).attr("cy");
+  point[0] = parseFloat(point[0]);
+  point[1] = parseFloat(point[1]);
 
   if (typea === "type0" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad00)"); }
   if (typea === "type0" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad01)"); }
@@ -599,7 +638,7 @@ function addPoint() {
   if (typea === "type3" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad32)"); }
   if (typea === "type3" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad33)"); }
 
-  console.log(point)
+  console.log('point', point)
   var check = indexArray(vertices, point);
   if (check[0]) {
     console.log('point already exists!');
@@ -620,9 +659,6 @@ function addPoint() {
 function linkArc(d) {
   var source = verticesInner[d.source];
   var target = verticesInner[d.target];
-  console.log('in link arc');
-  console.log(source);
-  console.log(verticesInner[d.source]);
   var dx = target[0] - source[0],
       dy = target[1] - source[1],
       dr = Math.sqrt(dx * dx + dy * dy);
@@ -630,6 +666,7 @@ function linkArc(d) {
 }
 
 function compute() {
+  solutionG.selectAll("text").remove("text");
   var nodes = [];
   var edges = { 1 : [], 0.5 : [], 0.2 : [],
                 0.7 : [], 0.6 : []};
@@ -645,7 +682,6 @@ function compute() {
         node1 = parseInt(node1);
         node2 = parseInt(node2);
         var edgeweight = compatibility[node1][node2];
-        console.log('edgeweight', edgeweight);
         if (edgeweight !== 0) {
           edges[edgeweight].push([i,j]);
           nonzeros = 1;
@@ -658,6 +694,13 @@ function compute() {
 
   if (nonzeros === 0) {
     console.log("No compatible acceptor donor pairs!");
+    solutionG.append("text")
+             .text("No compatible acceptor donor pairs!")
+             .attr("x", centerx)
+             .attr("y", centery)
+             .attr("font-size", "25px")
+             .attr("fill", "white")
+             .attr("text-anchor", "middle");
     return;
   }
 
