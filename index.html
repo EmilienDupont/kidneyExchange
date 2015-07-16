@@ -338,108 +338,6 @@ backgroundG.append("rect")
            .attr("fill", "black")
            .attr("opacity", .1);
 
-// Create buttons on a circle
-var positions = [];
-for (var i = 0; i < numCircles; i++) {
-  var angle = 2*Math.PI*i/(numCircles);
-  positions.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
-}
-
-backgroundG.selectAll("circle")
-           .data(positions)
-           .enter()
-           .append("circle")
-           .attr("cx", function(d) { return d[0]; })
-           .attr("cy", function(d) { return d[1]; })
-           .attr("r", circleSize)
-           .attr("stroke", "black")
-           .attr("stroke-width", 3)
-           .attr("stroke-opacity", 1)
-           .attr("fill", "black")
-           .attr("opacity", .5)
-           .on("mousedown", addPoint);
-
-// Initial points
-var vertices = [];
-var verticesType = [];
-var verticesInner = []; // positions arrows are going to point to
-
-var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
-var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
-
-// G object for points
-var pointsG = svg.append("g");
-
-// G object for solution
-var solutionG = svg.append("g");
-
-// G objects for buttons
-var buttonsG1 = svg.append("g");
-var buttonsG2 = svg.append("g");
-
-// Create graphics related to buttons
-buttonsG1.append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", width)
-        .attr("height", menu)
-        .attr("fill", "black")
-        .attr("opacity", .5)
-        .attr("stroke", "black");
-
-buttonsG1.append("text")
-        .attr("x", width/4)
-        .attr("y", 25)
-        .text("DONOR");
-
-buttonsG1.append("text")
-        .attr("x", 3*width/4)
-        .attr("y", 25)
-        .text("ACCEPTOR");
-
-buttonsG1.selectAll("text")
-       .attr("font-size", "25px")
-       .attr("fill", "white")
-       .attr("text-anchor", "middle");
-
-var buttons1 = buttonsG1.selectAll("circle")
-                      .data(buttondata1)
-                      .enter()
-                      .append("circle")
-                      .attr("cx", function(d) { return d; })
-                      .attr("cy", 55)
-                      .attr("r", 15)
-                      .attr("class", function(d,i) { return "type" + i % 4 ; })
-                      .attr("opacity", .3)
-                      .attr("stroke", "black")
-                      .on("mousedown", buttonpress1);
-
-var buttons2 = buttonsG2.selectAll("circle")
-                      .data(buttondata2)
-                      .enter()
-                      .append("circle")
-                      .attr("cx", function(d) { return d; })
-                      .attr("cy", 55)
-                      .attr("r", 15)
-                      .attr("class", function(d,i) { return "type" + i % 4 ; })
-                      .attr("opacity", .3)
-                      .attr("stroke", "black")
-                      .on("mousedown", buttonpress2);
-
-// Add markers to create arrows
-svg.append("defs").selectAll("marker")
-    .data(["arrow0", "arrow1", "arrow2", "arrow3", "arrow4"])
-    .enter().append("marker")
-    .attr("id", function(d) { return d; })
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 0)
-    .attr("refY", 0)
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 8)
-    .attr("orient", "auto")
-    .attr("class", function(d) { return d; })
-    .append("path")
-    .attr("d", "M0,-5L10,0L0,5");
 
 // Different color gradients for the half circles
 var grad00 = svg.append("defs").append("linearGradient").attr("id", "grad00")
@@ -506,6 +404,129 @@ var grad33 = svg.append("defs").append("linearGradient").attr("id", "grad33")
               .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
 grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
 grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
+
+
+// Create buttons on a circle
+var positions = [];
+var vertices = []; // initial vertices
+for (var i = 0; i < numCircles; i++) {
+  var angle = 2*Math.PI*i/(numCircles);
+  positions.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
+  if (i === 1 || i === 2 || i === 4 || i === 6 || i === 7 || i === 8) {
+    vertices.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
+  }
+}
+
+// Initial vertices
+var verticesType = [["type2","type0"], ["type1","type3"], ["type2","type1"],
+                    ["type0","type3"], ["type3","type1"], ["type1","type0"]];
+
+backgroundG.selectAll("circle")
+           .data(positions)
+           .enter()
+           .append("circle")
+           .attr("cx", function(d) { return d[0]; })
+           .attr("cy", function(d) { return d[1]; })
+           .attr("r", circleSize)
+           .attr("stroke", "black")
+           .attr("stroke-width", 3)
+           .attr("stroke-opacity", 1)
+           .attr("fill", function(d,i) { if (i === 1) { return "url(#grad20)"; }
+                                    else if (i === 2) { return "url(#grad13)"; }
+                                    else if (i === 4) { return "url(#grad21)"; }
+                                    else if (i === 6) { return "url(#grad03)"; }
+                                    else if (i === 7) { return "url(#grad31)"; }
+                                    else if (i === 8) { return "url(#grad10)"; }
+                                    else {return "black"; } } )
+           .attr("opacity", .5)
+           .on("mousedown", addPoint);
+
+
+var verticesInner = []; // positions arrows are going to point to
+for (var i = 0; i < vertices.length; i++) {
+  var vertex = vertices[i];
+  verticesInner.push([vertex[0] + 0.2*(centerx - vertex[0]), vertex[1] + 0.2*(centery - vertex[1])]);
+}
+
+
+var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
+var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
+
+// G object for points
+var pointsG = svg.append("g");
+
+// G object for solution
+var solutionG = svg.append("g");
+
+// G objects for buttons
+var buttonsG1 = svg.append("g");
+var buttonsG2 = svg.append("g");
+
+// Create graphics related to buttons
+buttonsG1.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", width)
+        .attr("height", menu)
+        .attr("fill", "black")
+        .attr("opacity", .5)
+        .attr("stroke", "black");
+
+buttonsG1.append("text")
+        .attr("x", width/4)
+        .attr("y", 25)
+        .text("DONOR");
+
+buttonsG1.append("text")
+        .attr("x", 3*width/4)
+        .attr("y", 25)
+        .text("ACCEPTOR");
+
+buttonsG1.selectAll("text")
+       .attr("font-size", "25px")
+       .attr("fill", "white")
+       .attr("text-anchor", "middle");
+
+var buttons1 = buttonsG1.selectAll("circle")
+                      .data(buttondata1)
+                      .enter()
+                      .append("circle")
+                      .attr("cx", function(d) { return d; })
+                      .attr("cy", 55)
+                      .attr("r", 15)
+                      .attr("class", function(d,i) { return "type" + i % 4 ; })
+                      .attr("stroke-width", function(d,i) { if (i === 0) { return 3; } else { return 1; } })
+                      .attr("opacity", function(d,i) { if (i === 0) { return 0.9; } else { return .3; } })
+                      .attr("stroke", "black")
+                      .on("mousedown", buttonpress1);
+
+var buttons2 = buttonsG2.selectAll("circle")
+                      .data(buttondata2)
+                      .enter()
+                      .append("circle")
+                      .attr("cx", function(d) { return d; })
+                      .attr("cy", 55)
+                      .attr("r", 15)
+                      .attr("class", function(d,i) { return "type" + i % 4 ; })
+                      .attr("stroke-width", function(d,i) { if (i === 1) { return 3; } else { return 1; } })
+                      .attr("opacity", function(d,i) { if (i === 1) { return 0.9; } else { return .3; } })
+                      .attr("stroke", "black")
+                      .on("mousedown", buttonpress2);
+
+// Add markers to create arrows
+svg.append("defs").selectAll("marker")
+    .data(["arrow0", "arrow1", "arrow2", "arrow3", "arrow4"])
+    .enter().append("marker")
+    .attr("id", function(d) { return d; })
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 0)
+    .attr("refY", 0)
+    .attr("markerWidth", 8)
+    .attr("markerHeight", 8)
+    .attr("orient", "auto")
+    .attr("class", function(d) { return d; })
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5");
 
 /* Note you should probably use Arcs for the half circles instead
   var vis = d3.select("body").append("svg")
