@@ -408,7 +408,7 @@ grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
 
 // Create buttons on a circle
 var positions = [];
-var vertices = []; // initial vertices
+var vertices = []; // Initial vertices
 for (var i = 0; i < numCircles; i++) {
   var angle = 2*Math.PI*i/(numCircles);
   positions.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
@@ -417,7 +417,7 @@ for (var i = 0; i < numCircles; i++) {
   }
 }
 
-// Initial vertices
+// Initial vertex types
 var verticesType = [["type2","type0"], ["type1","type3"], ["type2","type1"],
                     ["type0","type3"], ["type3","type1"], ["type1","type0"]];
 
