@@ -190,11 +190,34 @@ aside {
         <subtitle>with integer programming and Gurobi</subtitle>
     </div>
 
+    <p> Imagine a person in need of a kidney transplant who has a willing donor (e.g.
+    a family member). The donor's kidney is, however, incompatible with the patient
+    (because of differing blood types for example) and so the transplant cannot be made.
+    Now, suppose there are two patient-donor pairs. Donor 1 and patient 1 have incompatible
+    kidneys, but donor 2's kidney is compatible with patient 1 and donor 1's kidney is
+    compatible with patient 2's. A kidney exchange can then take place: patient 1 receives
+    kidney 2, and patient 2 receives kidney 1.</p>
+
+    <p> Now imagine this problem on a national scale. There are currently 70,000 patients
+    waiting on kidneys in the US. Using kidney exchange, the number of deaths related to
+    kidney disease could be significantly reduced. </p>
+
+    <p>
+      In this example we'll solve the kidney exchange problem. We'll construct a mathematical
+      model of the problem, implement this model in Gurobi's Python interface, and compute
+      and visualize an optimal solution.
+    </p>
+    <p> Reference the http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf paper</p>
+
     <div class="section" id="problem">
       <h2><a href="#problem" name="problem">Problem Description</a></h2>
       Problem description goes here
+      <p> Mention why cycles need to be short</p>
       <p>
-        Kidney exchange is an example of more general Barter Exchange Market problem.
+        Kidney exchange is an example of the more general Barter Exchange Market problem.
+        In this problem, agents seek to swap their items, creating cycles of agents where
+        each agent receives the item from the previous agent in the cycle. The goal is then
+        to find the cycles which maximize the utilities of each agent.
       </p>
     </div>
     <div class="section" id="model">
