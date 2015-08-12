@@ -130,49 +130,14 @@ aside {
   fill: yellow;
 }
 
-.link.arrow0 {
-  stroke: #f7fcb9;
-  fill: none;
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
 }
 
-.link.arrow1 {
-  stroke: #addd8e;
-  fill: none;
-}
-
-.link.arrow2 {
-  stroke: #31a354;
-  fill: none;
-}
-
-.link.arrow3 {
-  stroke: #ffffcc;
-  fill: none;
-}
-
-.link.arrow4 {
-  stroke: #c2e699;
-  fill: none;
-}
-
-.arrow0 {
-  fill: #f7fcb9;
-}
-
-.arrow1 {
-  fill: #addd8e;
-}
-
-.arrow2 {
-  fill: #31a354;
-}
-
-.arrow3 {
-  fill: #ffffcc;
-}
-
-.arrow4 {
-  fill: #c2e699;
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
 }
 
 </style>
@@ -395,8 +360,8 @@ backgroundG.append("rect")
            .attr("y", menu)
            .attr("width", width)
            .attr("height", height - menu)
-           .attr("fill", "black")
-           .attr("opacity", .1);
+           .attr("fill", "white")
+           .on("mousedown", addPoint);
 
 
 // Different color gradients for the half circles
@@ -466,48 +431,11 @@ grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
 grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
 
 
-// Create buttons on a circle
-var positions = [];
-var vertices = []; // Initial vertices
-for (var i = 0; i < numCircles; i++) {
-  var angle = 2*Math.PI*i/(numCircles);
-  positions.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
-  if (i === 1 || i === 2 || i === 4 || i === 6 || i === 7 || i === 8) {
-    vertices.push([ centerx + radius * Math.cos(angle),  centery + radius * Math.sin(angle)]);
-  }
-}
-
+var vertices = [];
+var verticesType = [];
 // Initial vertex types
-var verticesType = [["type2","type0"], ["type1","type3"], ["type2","type1"],
-                    ["type0","type3"], ["type3","type1"], ["type1","type0"]];
-
-backgroundG.selectAll("circle")
-           .data(positions)
-           .enter()
-           .append("circle")
-           .attr("cx", function(d) { return d[0]; })
-           .attr("cy", function(d) { return d[1]; })
-           .attr("r", circleSize)
-           .attr("stroke", "black")
-           .attr("stroke-width", 3)
-           .attr("stroke-opacity", 1)
-           .attr("fill", function(d,i) { if (i === 1) { return "url(#grad20)"; }
-                                    else if (i === 2) { return "url(#grad13)"; }
-                                    else if (i === 4) { return "url(#grad21)"; }
-                                    else if (i === 6) { return "url(#grad03)"; }
-                                    else if (i === 7) { return "url(#grad31)"; }
-                                    else if (i === 8) { return "url(#grad10)"; }
-                                    else {return "black"; } } )
-           .attr("opacity", .5)
-           .on("mousedown", addPoint);
-
-
-var verticesInner = []; // positions arrows are going to point to
-for (var i = 0; i < vertices.length; i++) {
-  var vertex = vertices[i];
-  verticesInner.push([vertex[0] + 0.2*(centerx - vertex[0]), vertex[1] + 0.2*(centery - vertex[1])]);
-}
-
+//var verticesType = [["type2","type0"], ["type1","type3"], ["type2","type1"],
+//                    ["type0","type3"], ["type3","type1"], ["type1","type0"]];
 
 var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
 var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
@@ -573,36 +501,6 @@ var buttons2 = buttonsG2.selectAll("circle")
                       .attr("stroke", "black")
                       .on("mousedown", buttonpress2);
 
-// Add markers to create arrows
-svg.append("defs").selectAll("marker")
-    .data(["arrow0", "arrow1", "arrow2", "arrow3", "arrow4"])
-    .enter().append("marker")
-    .attr("id", function(d) { return d; })
-    .attr("viewBox", "0 -5 10 10")
-    .attr("refX", 0)
-    .attr("refY", 0)
-    .attr("markerWidth", 8)
-    .attr("markerHeight", 8)
-    .attr("orient", "auto")
-    .attr("class", function(d) { return d; })
-    .append("path")
-    .attr("d", "M0,-5L10,0L0,5");
-
-/* Note you should probably use Arcs for the half circles instead
-  var vis = d3.select("body").append("svg")
-var pi = Math.PI;
-
-var arc = d3.svg.arc()
-    .innerRadius(50)
-    .outerRadius(70)
-    .startAngle(45 * (pi/180)) //converting from degs to radians
-    .endAngle(3) //just radians
-
-vis.append("path")
-    .attr("d", arc)
-    .attr("transform", "translate(50,50)")
- */
-
 function buttonpress1() {
   typea = d3.select(this).attr("class");
   buttons1.attr("stroke-width", 1)
@@ -624,42 +522,39 @@ function buttonpress2() {
 function indexArray (array, point) {
   var p0 = point[0];
   var p1 = point[1];
-  var bool = false;
   var index = -1;
   for (i = 0; i < array.length; i++) {
     pointprime = array[i];
     if (p0 === pointprime[0] && p1 === pointprime[1]) {
-      bool = true;
       index = i;
       break;
     }
   }
-  return [bool,index];
+  return index;
+}
+
+function colorfill() {
+  if (typea === "type0" && typeb === "type0") { return "url(#grad00)"; }
+  if (typea === "type0" && typeb === "type1") { return "url(#grad01)"; }
+  if (typea === "type0" && typeb === "type2") { return "url(#grad02)"; }
+  if (typea === "type0" && typeb === "type3") { return "url(#grad03)"; }
+  if (typea === "type1" && typeb === "type0") { return "url(#grad10)"; }
+  if (typea === "type1" && typeb === "type1") { return "url(#grad11)"; }
+  if (typea === "type1" && typeb === "type2") { return "url(#grad12)"; }
+  if (typea === "type1" && typeb === "type3") { return "url(#grad13)"; }
+  if (typea === "type2" && typeb === "type0") { return "url(#grad20)"; }
+  if (typea === "type2" && typeb === "type1") { return "url(#grad21)"; }
+  if (typea === "type2" && typeb === "type2") { return "url(#grad22)"; }
+  if (typea === "type2" && typeb === "type3") { return "url(#grad23)"; }
+  if (typea === "type3" && typeb === "type0") { return "url(#grad30)"; }
+  if (typea === "type3" && typeb === "type1") { return "url(#grad31)"; }
+  if (typea === "type3" && typeb === "type2") { return "url(#grad32)"; }
+  if (typea === "type3" && typeb === "type3") { return "url(#grad33)"; }
+  return "black";
 }
 
 function addPoint() {
-  var point = [0,0];
-  point[0] = d3.select(this).attr("cx");
-  point[1] = d3.select(this).attr("cy");
-  point[0] = parseFloat(point[0]);
-  point[1] = parseFloat(point[1]);
-
-  if (typea === "type0" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad00)"); }
-  if (typea === "type0" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad01)"); }
-  if (typea === "type0" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad02)"); }
-  if (typea === "type0" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad03)"); }
-  if (typea === "type1" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad10)"); }
-  if (typea === "type1" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad11)"); }
-  if (typea === "type1" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad12)"); }
-  if (typea === "type1" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad13)"); }
-  if (typea === "type2" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad20)"); }
-  if (typea === "type2" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad21)"); }
-  if (typea === "type2" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad22)"); }
-  if (typea === "type2" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad23)"); }
-  if (typea === "type3" && typeb === "type0") { d3.select(this).attr("fill", "url(#grad30)"); }
-  if (typea === "type3" && typeb === "type1") { d3.select(this).attr("fill", "url(#grad31)"); }
-  if (typea === "type3" && typeb === "type2") { d3.select(this).attr("fill", "url(#grad32)"); }
-  if (typea === "type3" && typeb === "type3") { d3.select(this).attr("fill", "url(#grad33)"); }
+  var point = d3.mouse(this);
 
   console.log('point', point)
   var check = indexArray(vertices, point);
