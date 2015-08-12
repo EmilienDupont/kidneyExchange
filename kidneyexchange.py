@@ -2,7 +2,7 @@
 
 from gurobipy import *
 
-# Note that these are in incorrect format
+# Note that these are in in different format than data received
 vertices  = range(5)
 edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
           (0,4) : 1, (4,0) : 1, (1,4) : 1, (4,1) : 1,
