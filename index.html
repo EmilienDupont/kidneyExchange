@@ -8,111 +8,10 @@
                       TeX: { equationNumbers: {autoNumber: "AMS"} },
                       "HTML-CSS": { showMathMenu: false,
                                     scale: 90 }
-
                      });
 </script>
-<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css">
+<link rel="stylesheet" href="http://examples.gurobi.com/base.css">
 <style>
-
-@import url(http://fonts.googleapis.com/css?family=PT+Serif|PT+Serif:b|PT+Serif:i|PT+Sans|PT+Sans:b);
-@import url(http://fonts.googleapis.com/css?family=Lato);
-html {
-   min-width: 1040px;
-}
-
-body {
-   background: #fcfcfa;
-   color: #333;
-   font-family: "PT Serif", serif;
-   /*margin: 0 1em 4em auto;*/
-   position: relative;
-   width: 960px;
-   left: 13em;
-}
-
-h1, h2, h3, h4 { font-family: "Lato", "PT Serif", serif; color: #000; text-rendering: optimizeLegibility; }
-
-h1 {
-  font-size: 64px;
-  line-height: 73px;
-  font-weight: 900;
-  margin-top: 0.67em;
-  margin-right: 0;
-  margin-bottom: 0;
-  margin-left: 0;
-}
-
-h2 {
-   margin-top: 2em;
-}
-
-subtitle {
-   display:block;
-   font-family: "PT Serif", serif;
-   font-size: 32px;
-   font-style: italic;
-   font-weight: 100;
-}
-
-p {
-  line-height: 150%;
-  width: 720px;
-}
-
-a {
-  color: steelblue;
-  cursor: auto;
-}
-
-a:not(:hover) {
-   text-decoration: none;
-}
-
-pre {
-   border-left: solid 2px #ccc;
-   padding-left: 18px;
-   margin: 2em 0 2em -20px;
-}
-
-aside {
-   font-size: small;
-   right: 0;
-   position: absolute;
-   width: 180px;
-}
-
-#nav {
-        left: 5px;
-        font-family: "Lato", serif;
-        font-weight: 700;
-        list-style: none;
-        margin: 0;
-        position: fixed;
-        top: 10px;
-        box-sizing: border-box;
-}
-
-
-#nav li {
-        margin-bottom: 0px;
-}
-
-#nav a {
-        color: #333;
-        display: block;
-        font-size: 14px;
-        border-left: 3px solid #fcfcfa;
-        padding: 5px 10px;
-        text-decoration: none;
-}
-
-#nav a:hover {
-   border-left: 3px solid steelblue;
-}
-
-#nav .current a {
-   border-left: 3px solid steelblue;
-}
 
 .type0 {
 }
@@ -144,8 +43,8 @@ aside {
     <li><a href="#implementation">Implementation</a></li>
     <li><a href="#demo">Live Demo</a></li>
   </ul>
-  <div id="container">
-    <div class="section" id="intro">
+  <div id="example_container">
+    <div class="example_section" id="intro">
       <h1>Kidney Exchange</h1>
         <subtitle>with integer programming and Gurobi</subtitle>
     </div>
@@ -169,7 +68,7 @@ aside {
     </p>
     <p> Reference the http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf paper</p>
 
-    <div class="section" id="problem">
+    <div class="example_section" id="problem">
       <h2><a href="#problem" name="problem">Problem Description</a></h2>
       Problem description goes here
       <p> Mention why cycles need to be short</p>
@@ -180,7 +79,7 @@ aside {
         to find the cycles which maximize the utilities of each agent.
       </p>
     </div>
-    <div class="section" id="model">
+    <div class="example_section" id="model">
       <h2><a href="#model" name="model">Mathematical Model</a></h2>
 
       <p>Model description goes here.</p>
@@ -221,12 +120,12 @@ aside {
       \]
       </p>
     </div>
-    <div class="section" id="implementation">
+    <div class="example_section" id="implementation">
       <h2><a href="#implementation" name="implementation">Implementation</a></h2>
       <p>Below is the full implementation of the model (and the associated data) in
         Gurobi's Python interface:
       </p>
-      <pre>
+      <examplecode>
       from gurobipy import *
 
       vertices  = range(5)
@@ -293,9 +192,9 @@ aside {
                       GRB.MAXIMIZE )
 
       m.optimize()
-      </pre>
+      </examplecode>
     </div>
-    <div class="section" id="demo">
+    <div class="example_section" id="demo">
       <h2><a href="#demo" name="demo">Live Demo</a></h2>
 
       <p> Click on the buttons at the top to change the type of acceptor/donor pairs. Click
