@@ -326,8 +326,85 @@ aside {
 //Width, height and button width
 var width = 800;
 var height = 650;
-var bw = width/10;
+var bw = width/10; // buttonwidth
 var menu = 80;
+
+// Set up force layout
+var force = d3.layout.force()
+    .charge(-120)
+    .linkDistance(50)
+    .size([width, height + menu/2]);
+
+var svg = d3.select("#demoarea")
+              .append("svg")
+              .attr("width", width)
+              .attr("height", height);
+
+// Initial graph
+graph = {
+  "nodes":[
+    {"donor":"type2","acceptor":"type0"},
+    {"donor":"type1","acceptor":"type3"},
+    {"donor":"type2","acceptor":"type1"},
+    {"donor":"type0","acceptor":"type3"},
+    {"donor":"type3","acceptor":"type1"},
+    {"donor":"type1","acceptor":"type0"}
+  ],
+  "links":[
+    {"source":0,"target":0,"value":1}
+  ]
+}
+
+force.nodes(graph.nodes)
+    .links(graph.links)
+    .start();
+
+var link = svg.selectAll(".link")
+    .data(graph.links)
+  .enter().append("path")
+    .attr("d", function(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" +
+            d.source.x + "," +
+            d.source.y + "A" +
+            dr + "," + dr + " 0 0,1 " +
+            d.target.x + "," +
+            d.target.y;
+    })
+    .attr("class", "link")
+    .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+    .attr("fill", "none");
+
+console.log(link);
+
+var node = svg.selectAll(".node")
+    .data(graph.nodes)
+  .enter().append("circle")
+    .attr("class", "node")
+    .attr("r", 5)
+    .style("fill", function(d) { return "black"; })
+    .call(force.drag);
+
+console.log(node);
+
+force.on("tick", function() {
+  link.attr("d", function(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" +
+            d.source.x + "," +
+            d.source.y + "A" +
+            dr + "," + dr + " 0 0,1 " +
+            d.target.x + "," +
+            d.target.y;
+    })
+
+  node.attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+});
 
 // Compatibility matrix between different donors and acceptors
 var type12 = .5, type13 = .2, type14 = 0;
@@ -339,22 +416,8 @@ var compatibility = [[1, type12, type13, type14],
                      [type14, type24, type34, 1]];
 
 // Initial types
-var typea = "type0";
-var typeb = "type1";
-
-// Graphics
-var svg = d3.select("#demoarea")
-              .append("svg")
-              .attr("width", width)
-              .attr("height", height);
-
-var backgroundG = svg.append("g");
-backgroundG.append("rect")
-           .attr("x", 0)
-           .attr("y", menu)
-           .attr("width", width)
-           .attr("height", height - menu)
-           .attr("fill", "rgb(240,240,240");
+var typeD = "type0"; // Donor Type
+var typeA = "type1"; // Acceptor Type
 
 
 // Different color gradients for the half circles
@@ -423,12 +486,6 @@ var grad33 = svg.append("defs").append("linearGradient").attr("id", "grad33")
 grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
 grad33.append("stop").attr("offset", "50%").style("stop-color", "yellow");
 
-
-var vertices = [];
-var verticesType = [];
-// Initial vertex types
-//var verticesType = [["type2","type0"], ["type1","type3"], ["type2","type1"],
-//                    ["type0","type3"], ["type3","type1"], ["type1","type0"]];
 
 var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
 var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
@@ -514,21 +571,21 @@ buttonsG3.append("text")
         .attr("text-anchor", "middle");
 
 function buttonpress1() {
-  typea = d3.select(this).attr("class");
+  typeD = d3.select(this).attr("class");
   buttons1.attr("stroke-width", 1)
           .attr("opacity", .3);
   d3.select(this).attr("stroke-width", 3)
                  .attr("opacity", .9);
-  console.log([typea, typeb]);
+  console.log([typeD, typeA]);
 }
 
 function buttonpress2() {
-  typeb = d3.select(this).attr("class");
+  typeA = d3.select(this).attr("class");
   buttons2.attr("stroke-width", 1)
           .attr("opacity", .3);
   d3.select(this).attr("stroke-width", 3)
                  .attr("opacity", .9);
-  console.log([typea, typeb]);
+  console.log([typeD, typeA]);
 }
 
 function indexArray (array, point) {
@@ -546,41 +603,28 @@ function indexArray (array, point) {
 }
 
 function colorfill() {
-  if (typea === "type0" && typeb === "type0") { return "url(#grad00)"; }
-  if (typea === "type0" && typeb === "type1") { return "url(#grad01)"; }
-  if (typea === "type0" && typeb === "type2") { return "url(#grad02)"; }
-  if (typea === "type0" && typeb === "type3") { return "url(#grad03)"; }
-  if (typea === "type1" && typeb === "type0") { return "url(#grad10)"; }
-  if (typea === "type1" && typeb === "type1") { return "url(#grad11)"; }
-  if (typea === "type1" && typeb === "type2") { return "url(#grad12)"; }
-  if (typea === "type1" && typeb === "type3") { return "url(#grad13)"; }
-  if (typea === "type2" && typeb === "type0") { return "url(#grad20)"; }
-  if (typea === "type2" && typeb === "type1") { return "url(#grad21)"; }
-  if (typea === "type2" && typeb === "type2") { return "url(#grad22)"; }
-  if (typea === "type2" && typeb === "type3") { return "url(#grad23)"; }
-  if (typea === "type3" && typeb === "type0") { return "url(#grad30)"; }
-  if (typea === "type3" && typeb === "type1") { return "url(#grad31)"; }
-  if (typea === "type3" && typeb === "type2") { return "url(#grad32)"; }
-  if (typea === "type3" && typeb === "type3") { return "url(#grad33)"; }
+  if (typeD === "type0" && typeA === "type0") { return "url(#grad00)"; }
+  if (typeD === "type0" && typeA === "type1") { return "url(#grad01)"; }
+  if (typeD === "type0" && typeA === "type2") { return "url(#grad02)"; }
+  if (typeD === "type0" && typeA === "type3") { return "url(#grad03)"; }
+  if (typeD === "type1" && typeA === "type0") { return "url(#grad10)"; }
+  if (typeD === "type1" && typeA === "type1") { return "url(#grad11)"; }
+  if (typeD === "type1" && typeA === "type2") { return "url(#grad12)"; }
+  if (typeD === "type1" && typeA === "type3") { return "url(#grad13)"; }
+  if (typeD === "type2" && typeA === "type0") { return "url(#grad20)"; }
+  if (typeD === "type2" && typeA === "type1") { return "url(#grad21)"; }
+  if (typeD === "type2" && typeA === "type2") { return "url(#grad22)"; }
+  if (typeD === "type2" && typeA === "type3") { return "url(#grad23)"; }
+  if (typeD === "type3" && typeA === "type0") { return "url(#grad30)"; }
+  if (typeD === "type3" && typeA === "type1") { return "url(#grad31)"; }
+  if (typeD === "type3" && typeA === "type2") { return "url(#grad32)"; }
+  if (typeD === "type3" && typeA === "type3") { return "url(#grad33)"; }
   return "black"; // Return default color if there is an error
 }
 
 function addPoint() {
-  var point = d3.mouse(this);
-
-  console.log('point', point)
-  var check = indexArray(vertices, point);
-  if (check > -1) {
-    console.log('point already exists!');
-    verticesType[check] = [typea,typeb];
-    return;
-  } else {
-    vertices.push(point);
-    verticesType.push([typea, typeb]);
-  }
-
-  console.log('verticesType', verticesType);
-  console.log('vertices', vertices)
+  graph.nodes.push({"donor": typeD, "acceptor": typeA});
+  console.log('nodes', graph.nodes);
 }
 
 function compute() {
