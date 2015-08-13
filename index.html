@@ -328,12 +328,6 @@ var width = 800;
 var height = 650;
 var bw = width/10;
 var menu = 80;
-var delta = 10;
-var radius = 250;
-var centerx = width/2;
-var centery = (height+menu)/2;
-var numCircles = 10;
-var circleSize = 27;
 
 // Compatibility matrix between different donors and acceptors
 var type12 = .5, type13 = .2, type14 = 0;
@@ -360,8 +354,7 @@ backgroundG.append("rect")
            .attr("y", menu)
            .attr("width", width)
            .attr("height", height - menu)
-           .attr("fill", "white")
-           .on("mousedown", addPoint);
+           .attr("fill", "rgb(240,240,240");
 
 
 // Different color gradients for the half circles
@@ -449,6 +442,7 @@ var solutionG = svg.append("g");
 // G objects for buttons
 var buttonsG1 = svg.append("g");
 var buttonsG2 = svg.append("g");
+var buttonsG3 = svg.append("g");
 
 // Create graphics related to buttons
 buttonsG1.append("rect")
@@ -476,30 +470,48 @@ buttonsG1.selectAll("text")
        .attr("text-anchor", "middle");
 
 var buttons1 = buttonsG1.selectAll("circle")
-                      .data(buttondata1)
-                      .enter()
-                      .append("circle")
-                      .attr("cx", function(d) { return d; })
-                      .attr("cy", 55)
-                      .attr("r", 15)
-                      .attr("class", function(d,i) { return "type" + i % 4 ; })
-                      .attr("stroke-width", function(d,i) { if (i === 0) { return 3; } else { return 1; } })
-                      .attr("opacity", function(d,i) { if (i === 0) { return 0.9; } else { return .3; } })
-                      .attr("stroke", "black")
-                      .on("mousedown", buttonpress1);
+          .data(buttondata1)
+          .enter()
+          .append("circle")
+          .attr("cx", function(d) { return d; })
+          .attr("cy", 55)
+          .attr("r", 15)
+          .attr("class", function(d,i) { return "type" + i % 4 ; })
+          .attr("stroke-width", function(d,i) { if (i === 0) { return 3; } else { return 1; } })
+          .attr("opacity", function(d,i) { if (i === 0) { return 0.9; } else { return .3; } })
+          .attr("stroke", "black")
+          .on("mousedown", buttonpress1);
 
 var buttons2 = buttonsG2.selectAll("circle")
-                      .data(buttondata2)
-                      .enter()
-                      .append("circle")
-                      .attr("cx", function(d) { return d; })
-                      .attr("cy", 55)
-                      .attr("r", 15)
-                      .attr("class", function(d,i) { return "type" + i % 4 ; })
-                      .attr("stroke-width", function(d,i) { if (i === 1) { return 3; } else { return 1; } })
-                      .attr("opacity", function(d,i) { if (i === 1) { return 0.9; } else { return .3; } })
-                      .attr("stroke", "black")
-                      .on("mousedown", buttonpress2);
+          .data(buttondata2)
+          .enter()
+          .append("circle")
+          .attr("cx", function(d) { return d; })
+          .attr("cy", 55)
+          .attr("r", 15)
+          .attr("class", function(d,i) { return "type" + i % 4 ; })
+          .attr("stroke-width", function(d,i) { if (i === 1) { return 3; } else { return 1; } })
+          .attr("opacity", function(d,i) { if (i === 1) { return 0.9; } else { return .3; } })
+          .attr("stroke", "black")
+          .on("mousedown", buttonpress2);
+
+buttonsG3.append("rect")
+         .attr("x", width/2 - 50)
+         .attr("y", 25)
+         .attr("height", 50)
+         .attr("width", 100)
+         .attr("stroke-width", 3)
+         .attr("stroke", "black")
+         .attr("fill", "rgb(210,210,210)")
+         .on("mousedown", addPoint);
+
+buttonsG3.append("text")
+        .text("ADD")
+        .attr("x", width/2)
+        .attr("y", 60)
+        .attr("font-size", "25px")
+        .attr("fill", "white")
+        .attr("text-anchor", "middle");
 
 function buttonpress1() {
   typea = d3.select(this).attr("class");
@@ -550,7 +562,7 @@ function colorfill() {
   if (typea === "type3" && typeb === "type1") { return "url(#grad31)"; }
   if (typea === "type3" && typeb === "type2") { return "url(#grad32)"; }
   if (typea === "type3" && typeb === "type3") { return "url(#grad33)"; }
-  return "black";
+  return "black"; // Return default color if there is an error
 }
 
 function addPoint() {
@@ -558,29 +570,17 @@ function addPoint() {
 
   console.log('point', point)
   var check = indexArray(vertices, point);
-  if (check[0]) {
+  if (check > -1) {
     console.log('point already exists!');
-    verticesType[check[1]] = [typea,typeb];
+    verticesType[check] = [typea,typeb];
     return;
   } else {
     vertices.push(point);
     verticesType.push([typea, typeb]);
-    var innerx = parseFloat(point[0]) + 0.2*(centerx - parseFloat(point[0]));
-    var innery = parseFloat(point[1]) + 0.2*(centery - parseFloat(point[1]));
-    verticesInner.push([innerx, innery]);
   }
 
   console.log('verticesType', verticesType);
   console.log('vertices', vertices)
-}
-
-function linkArc(d) {
-  var source = verticesInner[d.source];
-  var target = verticesInner[d.target];
-  var dx = target[0] - source[0],
-      dy = target[1] - source[1],
-      dr = Math.sqrt(dx * dx + dy * dy);
-  return "M" + source[0] + "," + source[1] + "A" + dr + "," + dr + " 0 0,1 " + target[0] + "," + target[1];
 }
 
 function compute() {
