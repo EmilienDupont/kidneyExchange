@@ -50,44 +50,55 @@
     </div>
 
     <p>
-      In this example we'll solve the Kidney Exchange Problem:
-      where to build warehouses to supply a large number of supermarkets.
+      In this example we'll solve the
+      <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">
+      Kidney Exchange Problem</a>.
     </p>
 
     <p>
-      We'll construct a mathematical model of the business problem,
+      We'll construct a mathematical model of the problem,
       implement this model in Gurobi's Python interface, and compute and
       visualize an optimal solution.
     </p>
 
-    <p>
-      Although your own business may not involve supermarkets, the
-      same basic techniques used in this example can be used for many
-      other applications in supply chain, logistics and transportation.
-    </p>
-
-    <p> Reference the http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf paper</p>
-
     <div class="example_section" id="problem">
       <h2><a href="#problem" name="problem">Problem Description</a></h2>
       <p>
-        Imagine a person in need of a kidney transplant who has a willing donor (e.g.
-        a family member). The donor's kidney is, however, incompatible with the patient
-        (because of differing blood types for example) and so the transplant cannot be made.
-        Now, suppose there are two patient-donor pairs. Donor 1 and patient 1 have incompatible
-        kidneys, but donor 2's kidney is compatible with patient 1 and donor 1's kidney is
-        compatible with patient 2's. A kidney exchange can then take place: patient 1 receives
-        kidney 2, and patient 2 receives kidney 1.
+        Imagine a person in need of a kidney transplant who has a willing
+        donor (e.g. a family member). The donor's kidney is, however,
+        incompatible with the patient (because of differing blood types for
+        example) and so the transplant cannot be made.
       </p>
 
       <p>
-        Now imagine this problem on a national scale. There are currently 70,000 patients
-        waiting on kidneys in the US. Using kidney exchange, the number of deaths related to
+        Now, suppose there are two patient-donor pairs. Donor 1 and patient
+        1 have incompatible kidneys, but donor 2's kidney is compatible with
+        patient 1 and donor 1's kidney is compatible with patient 2's. A
+        kidney exchange can then take place: patient 1 receives kidney 2, and
+        patient 2 receives kidney 1.
+      </p>
+
+      <p>
+        Now imagine this problem on a national scale. There are currently
+        <a href="http://www.unos.org/">70,000 patients</a> waiting on kidneys
+        in the US. Using kidney exchange, the number of deaths related to
         kidney disease could be significantly reduced.
       </p>
 
       <p>
-        Mention why cycles need to be short
+        Furthermore, kidney exchanges need not be between two patient-donor
+        pairs. We could, for example, transplant kidney 1 on patient 2, kidney
+        2 on patient 3 and kidney 3 on patient 1. Longer cycles with even more
+        patients could be possible, although this is usually not the case in
+        practice, for various reasons. If for example an exchange fails, more
+        people would be affected for longer cycles. In addition, all transplants
+        must be done simultaneously (otherwise donors could back out after their
+        partner has received a kidney), so longer cycles would require more
+        medical staff to be at the hospital at the same time.
+      </p>
+
+      <p>
+        In summary, we
       </p>
 
     </div>
@@ -95,10 +106,12 @@
       <h2><a href="#model" name="model">Mathematical Model</a></h2>
 
       <p>
-        Kidney exchange is an example of the more general Barter Exchange Market problem.
-        In this problem, agents seek to swap their items, creating cycles of agents where
-        each agent receives the item from the previous agent in the cycle. The goal is then
-        to find the cycles which maximize the utilities of each agent.
+        Kidney exchange is an example of the more general
+        <a href="https://en.wikipedia.org/wiki/Barter">Barter Exchange</a> Market
+        problem. In this problem, agents seek to swap their items, creating cycles
+        of agents where each agent receives the item from the previous agent in the
+        cycle. The goal is then to find the cycles which maximize the utilities of
+        each agent.
       </p>
 
       <p> Let $G$ be a graph where the set of vertices $V$ corresponds to acceptor/donor pairs
@@ -232,6 +245,7 @@
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="d3.min.js"></script>
 <script>
 
 /*******************************
@@ -276,12 +290,13 @@ graph = {
 
 // Set up force layout
 var force = d3.layout.force()
-    .nodes(graph.nodes)
-    .links(graph.links)
     .charge(-400)
     .linkDistance(120)
     .size([width, height + menu/2])
     .on("tick", tick);
+
+console.log('nodes in force', force.nodes());
+console.log('links in force', force.links());
 
 var link = svg.selectAll(".link");
 
@@ -292,7 +307,8 @@ function start() {
 
   force.nodes(graph.nodes)
        .links(graph.links)
-       .start();
+       .start()
+       .stop();
 
   link.remove();
   link = link.data(graph.links)
