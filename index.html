@@ -245,7 +245,6 @@
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-<script src="d3.min.js"></script>
 <script>
 
 /*******************************
@@ -274,42 +273,83 @@ var svg = d3.select("#demoarea")
  *******************************/
 
 // Initial graph
+/*
 graph = {
   "nodes":[
-    {"donor":"type2","acceptor":"type0"},
-    {"donor":"type1","acceptor":"type3"},
-    {"donor":"type2","acceptor":"type1"},
-    {"donor":"type0","acceptor":"type3"},
-    {"donor":"type3","acceptor":"type1"},
-    {"donor":"type1","acceptor":"type0"}
+    {"id":0,"donor":"type2","acceptor":"type0"},
+    {"id":1,"donor":"type1","acceptor":"type3"},
+    {"id":2,"donor":"type2","acceptor":"type1"},
+    {"id":3,"donor":"type0","acceptor":"type3"},
+    {"id":4,"donor":"type3","acceptor":"type1"},
+    {"id":5,"donor":"type1","acceptor":"type0"}
   ],
   "links":[
     {"source":0,"target":0,"value":1}
   ]
 }
+*/
 
 // Set up force layout
 var force = d3.layout.force()
     .charge(-400)
     .linkDistance(120)
-    .size([width, height + menu/2])
-    .on("tick", tick);
+    .size([width, height + menu/2]);
+    //.on("tick", tick);
 
 console.log('nodes in force', force.nodes());
 console.log('links in force', force.links());
 
+var nodes = force.nodes();
+var links = force.links();
+
+addNode(0,"type2","type0");
+addNode(1,"type1","type3");
+addNode(2,"type2","type1");
+
+function addNode(id, acceptor, donor) {
+    nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
+    start();
+}
+
+function addLink(source, target) {
+    links.push({"source":source,"target":target,"value":1});
+    start();
+}
+/*
 var link = svg.selectAll(".link");
 
-var node = svg.selectAll(".node");
+var node = svg.selectAll(".node"); */
 
 function start() {
   console.log("in start()");
-
+/*
   force.nodes(graph.nodes)
        .links(graph.links)
        .start()
-       .stop();
+       .stop(); */
 
+  var link = svg.selectAll(".link")
+                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+  
+  link.enter().append("path")
+      .attr("d", function(d) {
+            console.log('d', d);
+            var dx = d.target.x - d.source.x,
+                dy = d.target.y - d.source.y,
+                dr = Math.sqrt(dx * dx + dy * dy);
+            return "M" +
+                d.source.x + "," +
+                d.source.y + "A" +
+                dr + "," + dr + " 0 0,1 " +
+                d.target.x + "," +
+                d.target.y;
+      })
+      .attr("class", "link")
+      .style("stroke-width", function(d) { return Math.sqrt(d.value); })
+      .attr("fill", "none");
+  
+  link.exit().remove();
+  /*
   link.remove();
   link = link.data(graph.links)
           .enter().append("path")
@@ -327,8 +367,21 @@ function start() {
           })
           .attr("class", "link")
           .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-          .attr("fill", "none");
+          .attr("fill", "none"); */
 
+  var node = svg.selectAll(".node")
+                .data(nodes, function(d) { return d.id;});
+  
+  node.enter().append("circle")
+      .attr("class", "node")
+      .attr("r", 8)
+      .style("fill", function(d) { return colorfill(d.donor); })
+      .style("stroke", function(d) { return colorfill(d.acceptor)})
+      .call(force.drag);
+  
+  node.exit().remove();
+  
+  /*
   node.remove();
   node = node.data(graph.nodes)
         .enter().append("circle")
@@ -336,11 +389,29 @@ function start() {
         .attr("r", 8)
         .style("fill", function(d) { return colorfill(d.donor); })
         .style("stroke", function(d) { return colorfill(d.acceptor)})
-        .call(force.drag);
+        .call(force.drag); */
+  
+  force.on("tick", function() { 
+        link.attr("d", function(d) {
+        var dx = d.target.x - d.source.x,
+            dy = d.target.y - d.source.y,
+            dr = Math.sqrt(dx * dx + dy * dy);
+        return "M" +
+            d.source.x + "," +
+            d.source.y + "A" +
+            dr + "," + dr + " 0 0,1 " +
+            d.target.x + "," +
+            d.target.y;
+        });
+        
+        node.attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; });
+  })
 
   force.start();
 }
 
+/*
 function tick() {
   link.attr("d", function(d) {
         var dx = d.target.x - d.source.x,
@@ -356,14 +427,14 @@ function tick() {
 
   node.attr("cx", function(d) { return d.x; })
       .attr("cy", function(d) { return d.y; });
-}
+} */
 
 // Function to color the nodes
 function colorfill(colortype) {
   return colors[parseInt(colortype[4])]; // E.g. if "type0" return colors[0]
 }
 
-start();
+//start();
 
 /*******************************
  *
