@@ -50,7 +50,9 @@
     </div>
 
     <p>
-      In this example we'll solve the Kidney Exchange Problem.
+      In this example we'll solve the Kidney Exchange Problem: how to
+      exchange kidneys between donors and patients in need of a
+      transplant.
     </p>
 
     <p>
@@ -99,7 +101,9 @@
       </p>
 
       <p>
-        In summary, we
+        In summary, we are required to find the set of cycles, of length at
+        most 3, which maximizes the number of patients receiving an appropriate
+        kidney.
       </p>
 
     </div>
@@ -125,7 +129,10 @@
       <p>
         Let $G$ be a graph where the set of vertices $V$ corresponds to
         acceptor/donor pairs and the set of directed weighted edges $E$ represent
-        a compatibility factor between a donor and an acceptor.
+        compatibility factors between donors and acceptors. If, for example,
+        patient 1 and kidney 2 are perfectly compatible (same blood type etc...)
+        we give the edge (1,2) weight 1. If they are less compatible and the risk
+        of failure of a transplant is higher, then we give the edge a lower weight.
       </p>
 
       <p>
@@ -153,9 +160,9 @@
         Now since an acceptor only needs to receive one kidney and a donor can
         at most give one kidney, each vertex of the vertex the graph can be in
         at most one cycle. We therefore find all the cycles in which a given
-        vertex $v$ is included. To impose the constraint, the sum of these binary
-        variables can at most be one. So we have the set of constraints (one for
-        each vertex $v$)
+        vertex $v$ is included. To impose the constraint, the sum of the binary
+        variables corresponding to these cycles can at most be one. So we have
+        the set of constraints (one for each vertex $v$)
         \[
         \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
         \]
