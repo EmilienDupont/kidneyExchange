@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from gurobipy import *
+import StringIO
 
 # Note that these are in in different format than data received
 vertices  = range(5)
@@ -8,6 +9,10 @@ edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
           (0,4) : 1, (4,0) : 1, (1,4) : 1, (4,1) : 1,
           (1,3) : 1, (3,1) : 1, (2,3) : 1, (3,2) : 1,
           (3,4) : 1, (4,3) : 1 }
+
+def mycallback(model, where):
+    if where == GRB.callback.MESSAGE:
+        print >>model.__output, model.cbGet(GRB.callback.MSG_STRING),
 
 def twoCycle(vertices, edges):
     '''
@@ -40,15 +45,15 @@ def threeCycle(vertices, edges):
     return threeCycles
 
 def optimize(vertices, edges, output=False):
-    twoCycles = twoCycle(vertices,edges)
-    threeCycles = threeCycle(vertices,edges)
-
     m = Model()
 
     if not output:
         m.params.OutputFlag = 0
 
     m.setParam('TimeLimit', 10)
+    
+    twoCycles = twoCycle(vertices,edges)
+    threeCycles = threeCycle(vertices,edges)
     
     c = {}
 
@@ -72,7 +77,10 @@ def optimize(vertices, edges, output=False):
                     quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
                     GRB.MAXIMIZE )
 
-    m.optimize()
+    output = StringIO.StringIO()
+    m.__output = output
+
+    m.optimize(mycallback)
     
     if (m.status != 2):
         return ["error"]
@@ -83,7 +91,7 @@ def optimize(vertices, edges, output=False):
         if (c[cycle].X > .5):
             solution.append(cycle)
 
-    return solution
+    return [solution, output.getvalue()]
 
 # Because javascript does not have tuples, need to change data structures
 # We receive edges as {edgeweight: list of edges (as arrays)} and want to transform

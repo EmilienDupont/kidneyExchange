@@ -334,6 +334,25 @@ table, th, td {
       <div id="demoarea">
       </div>
       <button class="pure-button" onclick="compute()">Compute</button>
+      <p>
+        <button class="pure-button" onclick="toggle_div()">Gurobi Log</button>
+      </p>
+
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+      <script>
+        function toggle_div() {
+          var logfile = d3.select('#logfile');
+          if (logfile.style("display") === "none") {
+            logfile.style("display", "block");
+          } else {
+            logfile.style("display", "none");
+          }
+        }
+      </script>
+
+      <examplecode id=logfile>
+      </examplecode>
     </div>
 
     <div style="min-height:100px"></div>
@@ -348,6 +367,9 @@ table, th, td {
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script>
+
+// Hide Log File initially
+d3.select('#logfile').style("display", "none");
 
 //Width, height button width, menu size
 var width = 800;
@@ -670,12 +692,17 @@ function serverResponse(error, data) {
    if (!error) {
       if ('solution' in data) {
 
-        var solution = data['solution'];
-        console.log('solution', solution)
-        if (solution[0] === "error") {
+        var solutionTemp = data['solution'];
+        console.log('solution', solutionTemp)
+        if (solutionTemp[0] === "error") {
           alert("10 second solve time limit exceeded. Reduce the number of patients.");
           return;
         }
+        var solution = solutionTemp[0];
+        var logMsg = solutionTemp[1]; // Log message to display
+        
+        d3.select('#logfile').html(logMsg);
+        
         removeAllLinks();
         // Add the edges of the cycles to graph.links
         for (var i = 0; i < solution.length; i++) {
