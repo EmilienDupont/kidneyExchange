@@ -50,9 +50,7 @@
     </div>
 
     <p>
-      In this example we'll solve the
-      <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">
-      Kidney Exchange Problem</a>.
+      In this example we'll solve the Kidney Exchange Problem.
     </p>
 
     <p>
@@ -74,8 +72,9 @@
         Now, suppose there are two patient-donor pairs. Donor 1 and patient
         1 have incompatible kidneys, but donor 2's kidney is compatible with
         patient 1 and donor 1's kidney is compatible with patient 2's. A
-        kidney exchange can then take place: patient 1 receives kidney 2, and
-        patient 2 receives kidney 1.
+        <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">kidney exchange</a>
+        can then take place: patient 1 receives kidney 2, and patient 2
+        receives kidney 1.
       </p>
 
       <p>
@@ -94,7 +93,9 @@
         people would be affected for longer cycles. In addition, all transplants
         must be done simultaneously (otherwise donors could back out after their
         partner has received a kidney), so longer cycles would require more
-        medical staff to be at the hospital at the same time.
+        medical staff to be at the hospital at the same time. Therefore, in
+        practice, the number of acceptor/donor pairs in a cycle should be at
+        most 3.
       </p>
 
       <p>
@@ -109,46 +110,68 @@
         Kidney exchange is an example of the more general
         <a href="https://en.wikipedia.org/wiki/Barter">Barter Exchange</a> Market
         problem. In this problem, agents seek to swap their items, creating cycles
-        of agents where each agent receives the item from the previous agent in the
-        cycle. The goal is then to find the cycles which maximize the utilities of
-        each agent.
+        of agents where each agent receives the item from the previous agent in
+        the cycle. The goal is then to find the cycles which maximize the
+        utilities of each agent. In contrast to usual exchanges, items are swapped
+        directly without the use of money.
       </p>
 
-      <p> Let $G$ be a graph where the set of vertices $V$ corresponds to acceptor/donor pairs
-      and the set of directed weighted edges $E$ represent a compatibility factor between a donor and an acceptor. </p>
+      <p>
+        There are <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">
+        several ways</a> to formulate this problem as an integer program. We will
+        use a <em>cycle cover</em> formulation.
+      </p>
+      
+      <p>
+        Let $G$ be a graph where the set of vertices $V$ corresponds to
+        acceptor/donor pairs and the set of directed weighted edges $E$ represent
+        a compatibility factor between a donor and an acceptor.
+      </p>
 
-      <p> Let $C$ be the set of cycles in the graph of length at most 3. Let $w_c$ denote the weight of
-      the cycle, which is the sum of the edge weights in the cycle. Our goal is to find a cycle cover
-      of the graph with maximum weight. Therefore we define a binary variable $c$ for each cycle
-      such that
-      \[
-      c = \left\{\begin{array}{ll}
-             1 & \text{if cycle is in the cover}\\
-             0 & \mathrm{otherwise}
-            \end{array}\right.
-      \]
+      <p>
+        Let $C$ be the set of cycles in the graph of length at most 3. Let $w_c$
+        denote the weight of the cycle, which is the sum of the edge weights in
+        the cycle. Our goal is to find a cycle cover of the graph with maximum
+        weight. Therefore we define a binary variable $c$ for each cycle such
+        that
+        \[
+        c = \left\{\begin{array}{ll}
+               1 & \text{if cycle is in the cover}\\
+               0 & \mathrm{otherwise}
+              \end{array}\right.
+        \]
       </p>
-      <p> The objective we seek to maximize is the total weight of the cover, i.e.
-      \[
-      \text{cycle cover weight} = \sum_{c \in C} w_c c
-      \]</p>
-      <p> Now since an acceptor only needs to receive one kidney and a donor can at most give one kidney,
-    each vertex of the vertex the graph can be in at most one cycle. We therefore find all the cycles in which
-    a given vertex $v$ is included. To impose the constraint, the sum of these binary variables can at most be one.
-    So we have the set of constraints (one for each vertex $v$)
-    \[
-    \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
-    \]
+      
+      <p>
+        The objective we seek to maximize is the total weight of the cover, i.e.
+        \[
+        \text{cycle cover weight} = \sum_{c \in C} w_c c
+        \]
       </p>
-      <p> So finally we have
-       \[
-      \begin{array}{ll}
-      \text{maximize} & \sum_{c \in C} w_c c \\
-      \text{subject to} & \sum_{c : v \in c} c \leq 1 \quad \forall v \in V \\
-                        & c \in \{ 0, 1 \} \quad \forall c \in C
-      \end{array}
-      \]
+      
+      <p>
+        Now since an acceptor only needs to receive one kidney and a donor can
+        at most give one kidney, each vertex of the vertex the graph can be in
+        at most one cycle. We therefore find all the cycles in which a given
+        vertex $v$ is included. To impose the constraint, the sum of these binary
+        variables can at most be one. So we have the set of constraints (one for
+        each vertex $v$)
+        \[
+        \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
+        \]
       </p>
+      
+      <p>
+        So finally our optimization model becomes
+        \[
+        \begin{array}{ll}
+        \text{maximize} & \sum_{c \in C} w_c c \\
+        \text{subject to} & \sum_{c : v \in c} c \leq 1 \quad \forall v \in V \\
+                          & c \in \{ 0, 1 \} \quad \forall c \in C
+        \end{array}
+        \]
+      </p>
+      
     </div>
     <div class="example_section" id="implementation">
       <h2><a href="#implementation" name="implementation">Implementation</a></h2>
