@@ -305,14 +305,19 @@ var links = force.links();
 addNode(0,"type2","type0");
 addNode(1,"type1","type3");
 addNode(2,"type2","type1");
+addNode(3,"type0","type3");
+addNode(4,"type3","type1");
+addNode(5,"type1","type0");
+//addLink(0,1,100);
+
 
 function addNode(id, acceptor, donor) {
     nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
     start();
 }
 
-function addLink(source, target) {
-    links.push({"source":source,"target":target,"value":1});
+function addLink(source, target, value) {
+    links.push({"source":source,"target":target,"value":value});
     start();
 }
 /*
@@ -554,9 +559,9 @@ function buttonpress2() {
 }
 
 function addPoint() {
-  graph.nodes.push({"donor": typeD, "acceptor": typeA});
-  console.log('nodes', graph.nodes);
-  start();
+  var n = force.nodes().length; // New node id
+  console.log('n',n);
+  addNode(n, typeD, typeA);
 }
 
 
@@ -588,13 +593,16 @@ function compute() {
                 0.7 : [], 0.6 : []};
 
   var nonzeros = 0;
+  
+  var numNodes = force.nodes().length;
+  var nodes = force.nodes();
 
-  for (var i = 0; i < graph.nodes.length; i++) { // Iterate over donors
+  for (var i = 0; i < numNodes; i++) { // Iterate over donors
     vertices.push(i);
-    for (var j = 0; j < graph.nodes.length; j++) { // Iterate over acceptors
+    for (var j = 0; j < numNodes; j++) { // Iterate over acceptors
       if (i !== j) {
-        var node1 = graph.nodes[i].donor.charAt(4);
-        var node2 = graph.nodes[j].acceptor.charAt(4);
+        var node1 = nodes[i].donor.charAt(4);
+        var node2 = nodes[j].acceptor.charAt(4);
         node1 = parseInt(node1);
         node2 = parseInt(node2);
         var edgeweight = compatibility[node1][node2];
@@ -637,21 +645,20 @@ function serverResponse(error, data) {
         console.log('solution', solution)
 
         // Add the edges of the cycles to graph.links
-        graph.links = [];
         for (var i = 0; i < solution.length; i++) {
           cycle = solution[i];
           console.log(cycle);
           for (var j = 0; j < cycle.length - 1; j++) {
-            graph.links.push({source: cycle[j], target: cycle[j+1],
-                       value: 5});
+            addLink(cycle[j], cycle[j+1], 5);
+            //graph.links.push({source: cycle[j], target: cycle[j+1],
+            //         value: 5});
             //console.log(verticesType[cycle[j]]);
           }
-          graph.links.push({source: cycle[cycle.length-1], target: cycle[0],
-                     value: 5});
+          addLink(cycle[cycle.length-1],cycle[0],5);
+          //graph.links.push({source: cycle[cycle.length-1], target: cycle[0],
+          //           value: 5});
           //console.log(verticesType[cycle[cycle.length-1]]);
         }
-        console.log('links', graph.links);
-        start();
       }
    }
 }
