@@ -13,16 +13,9 @@
 <link rel="stylesheet" href="http://examples.gurobi.com/base.css">
 <style>
 
-.type0 {
-}
-
-.type1 {
-}
-
-.type2 {
-}
-
-.type3 {
+table, th, td {
+    border: 1px solid black;
+    padding: 5px;
 }
 
 .node {
@@ -256,9 +249,100 @@
     </div>
     <div class="example_section" id="demo">
       <h2><a href="#demo" name="demo">Live Demo</a></h2>
+      <p>
+        Below is a visualization of our Kidney Exchange example.
+      </p>
+      <p>
+        Patient/donor pairs are represented by:
+        <svg height="20" width="20">
+          <circle cx="10" cy="10" r="8" stroke="rgb(230,230,230)" stroke-width="3" fill="white" />
+        </svg>
+        where the outline represents the type of the donor and the fill
+        represents the type of the acceptor.
+      </p>
+      <p>
+        Each patient type is represented by a color. There are different
+        compatibility factors between different types as shown in the table:
 
-      <p> Click on the buttons at the top to change the type of acceptor/donor pairs. Click
-      on the circles to add/change pairs. Click compute to compute the optimal kidney exchange. </p>
+        <table>
+        <thead>
+        <tr>
+        <td></td>
+        <td>
+        <svg width="40" height="25">
+          <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+        </svg>  
+        </td>
+        <td>
+        <svg width="40" height="25">
+          <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+        </svg>    
+        </td>
+        <td>
+        <svg width="40" height="25">
+          <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+        </svg>  
+        </td>
+        <td>
+        <svg width="40" height="25">
+          <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+        </svg>  
+        </td>
+        </tr>
+        <tbody>
+        <tr><td>
+            <svg width="40" height="25">
+              <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+            </svg>  
+            </td>
+            <td>1</td>
+            <td>0.5</td>
+            <td>0.2</td>
+            <td>0</td>
+        </tr>
+        <tr><td>
+            <svg width="40" height="25">
+              <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+            </svg>  
+            </td>
+            <td>0.5</td>
+            <td>1</td>
+            <td>0</td>
+            <td>0.7</td>
+        </tr>
+        <tr><td>
+            <svg width="40" height="25">
+              <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+            </svg>  
+            </td>
+            <td>0.2</td>
+            <td>0</td>
+            <td>1</td>
+            <td>0.6</td>
+        </tr>
+        <tr><td>
+            <svg width="40" height="25">
+              <rect width="40" height="25" style="fill:rgb(0,0,255)" />
+            </svg>   
+            </td>
+            <td>0</td>
+            <td>0.7</td>
+            <td>0.6</td>
+            <td>1</td>
+        </tr>
+        </tbody>
+        </table>
+      </p>
+      <p>
+        You can add acceptor/donor pairs by choosing an acceptor and donor
+        type and clicking "ADD".
+      </p>
+        
+      <p>
+        To find the optimal kidney exchange using Gurobi, click "Compute".
+        Drag the nodes around to make the visualization clearer.
+      </p>
+      
       <div id="demoarea">
       </div>
       <button class="pure-button" onclick="compute()">Compute</button>
@@ -296,10 +380,7 @@ var svg = d3.select("#demoarea")
  *
  *******************************/
 // G object for points
-var pointsG = svg.append("g");
-
-// G object for solution
-var solutionG = svg.append("g");
+var background = svg.append("g");
 
 // G objects for buttons
 var buttonsG1 = svg.append("g");
@@ -540,7 +621,6 @@ var typeA = "type1"; // Acceptor Type
 
 
 function compute() {
-  solutionG.selectAll("text").remove("text");
   var vertices = [];
   var edges = { 1 : [], 0.5 : [], 0.2 : [],
                 0.7 : [], 0.6 : []};
