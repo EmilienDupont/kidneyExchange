@@ -89,6 +89,14 @@ def transform(nodes, edges):
     print newEdges
     return optimize(newNodes, newEdges)
 
-solution = optimize(vertices, edges)
+def handleoptimize(jsdict):
+    if 'nodes' in jsdict and 'edges' in jsdict:
+        solution = transform(jsdict['nodes'], jsdict['edges'])
+        return {'solution': solution }
 
-print solution
+if __name__ == '__main__':
+    import json
+    jsdict = json.load(sys.stdin)
+    jsdict = handleoptimize(jsdict)
+    print 'Content-Type: application/json\n\n'
+    print json.dumps(jsdict)
