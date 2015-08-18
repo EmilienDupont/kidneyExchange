@@ -39,12 +39,17 @@ def threeCycle(vertices, edges):
                 threeCycles[(u,w,v)] = edges[(u,v)] + edges[(u,w)] + edges[(w,v)]
     return threeCycles
 
-def optimize(vertices, edges):
+def optimize(vertices, edges, output=False):
     twoCycles = twoCycle(vertices,edges)
     threeCycles = threeCycle(vertices,edges)
 
     m = Model()
 
+    if not output:
+        m.params.OutputFlag = 0
+
+    m.setParam('TimeLimit', 10)
+    
     c = {}
 
     for cycle in twoCycles:
@@ -68,6 +73,9 @@ def optimize(vertices, edges):
                     GRB.MAXIMIZE )
 
     m.optimize()
+    
+    if (m.status != 2):
+        return ["error"]
 
     solution = []
 
@@ -80,14 +88,13 @@ def optimize(vertices, edges):
 # Because javascript does not have tuples, need to change data structures
 # We receive edges as {edgeweight: list of edges (as arrays)} and want to transform
 # this to {edge (as tuple): edgeweight}
-def transform(nodes, edges):
+def transform(nodes, edges, output=False):
     newNodes = range(len(nodes))
     newEdges = {}
     for edgeweight in edges:
         for edge in edges[edgeweight]:
             newEdges[(edge[0], edge[1])] = float(edgeweight)
-    print newEdges
-    return optimize(newNodes, newEdges)
+    return optimize(newNodes, newEdges, output)
 
 def handleoptimize(jsdict):
     if 'nodes' in jsdict and 'edges' in jsdict:

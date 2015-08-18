@@ -672,6 +672,10 @@ function serverResponse(error, data) {
 
         var solution = data['solution'];
         console.log('solution', solution)
+        if (solution[0] === "error") {
+          alert("10 second solve time limit exceeded. Reduce the number of patients.");
+          return;
+        }
         removeAllLinks();
         // Add the edges of the cycles to graph.links
         for (var i = 0; i < solution.length; i++) {
@@ -679,14 +683,8 @@ function serverResponse(error, data) {
           console.log(cycle);
           for (var j = 0; j < cycle.length - 1; j++) {
             addLink(cycle[j], cycle[j+1], 5);
-            //graph.links.push({source: cycle[j], target: cycle[j+1],
-            //         value: 5});
-            //console.log(verticesType[cycle[j]]);
           }
-          addLink(cycle[cycle.length-1],cycle[0],5);
-          //graph.links.push({source: cycle[cycle.length-1], target: cycle[0],
-          //           value: 5});
-          //console.log(verticesType[cycle[cycle.length-1]]);
+          addLink(cycle[cycle.length-1],cycle[0], 5);
         }
       }
    }
