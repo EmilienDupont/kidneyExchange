@@ -308,7 +308,6 @@ addNode(2,"type2","type1");
 addNode(3,"type0","type3");
 addNode(4,"type3","type1");
 addNode(5,"type1","type0");
-//addLink(0,1,100);
 
 
 function addNode(id, acceptor, donor) {
@@ -319,6 +318,11 @@ function addNode(id, acceptor, donor) {
 function addLink(source, target, value) {
     links.push({"source":source,"target":target,"value":value});
     start();
+}
+
+function removeAllLinks() {
+  links.splice(0,links.length);
+  start();
 }
 /*
 var link = svg.selectAll(".link");
@@ -559,6 +563,7 @@ function buttonpress2() {
 }
 
 function addPoint() {
+  removeAllLinks();
   var n = force.nodes().length; // New node id
   console.log('n',n);
   addNode(n, typeD, typeA);
@@ -643,7 +648,7 @@ function serverResponse(error, data) {
 
         var solution = data['solution'];
         console.log('solution', solution)
-
+        removeAllLinks();
         // Add the edges of the cycles to graph.links
         for (var i = 0; i < solution.length; i++) {
           cycle = solution[i];
