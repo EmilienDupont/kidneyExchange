@@ -366,10 +366,14 @@ table, th, td {
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js"></script>
 <script>
 
 // Hide Log File initially
 d3.select('#logfile').style("display", "none");
+
+// Needed for loading screen
+var spinner;
 
 //Width, height button width, menu size
 var width = 800;
@@ -401,6 +405,9 @@ var buttonsG3 = svg.append("g");
 // G objects for force layout
 var linksG = svg.append("g");
 var nodesG = svg.append("g");
+
+// G object for spinner
+var spinnerG = svg.append("g");
 
 /*******************************
  *
@@ -639,6 +646,23 @@ var typeA = "type1"; // Acceptor Type
 
 
 function compute() {
+  // Show loading screen
+  spinnerG.append("rect")
+          .attr("x", 0).attr("y", 0)
+          .attr("width", width).attr("height", height)
+          .attr("fill", "white")
+          .attr("opacity", .5);
+  spinnerG.append("text")
+          .attr("x", width/2)
+          .attr("y", .4*height)
+          .attr("font-size", 25)
+          .attr("font-family", "Helvetica Neue")
+          .attr("font-weight", 400)
+          .attr("text-anchor", "middle")
+          .text("Computing...");
+  var target = document.getElementById('demoarea');
+  spinner = new Spinner({left: '375%'}).spin(target);
+  
   var vertices = [];
   var edges = { 1 : [], 0.5 : [], 0.2 : [],
                 0.7 : [], 0.6 : []};
@@ -688,6 +712,11 @@ function compute() {
 function serverResponse(error, data) {
    console.log('serverResponse');
    console.log('data', data);
+   
+   // Remove loading screen
+   spinnerG.selectAll("rect").remove("rect");
+   spinnerG.selectAll("text").remove("text");
+   spinner.stop();
 
    if (!error) {
       if ('solution' in data) {
