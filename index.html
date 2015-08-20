@@ -93,7 +93,7 @@ table, th, td {
         must be done simultaneously (otherwise donors could back out after their
         partner has received a kidney), so longer cycles would require more
         medical staff to be at the hospital at the same time. Therefore, in
-        practice, the number of acceptor/donor pairs in a cycle should be at
+        practice, the number of donor/recipient pairs in a cycle should be at
         most 3.
       </p>
 
@@ -125,8 +125,8 @@ table, th, td {
       
       <p>
         Let $G$ be a graph where the set of vertices $V$ corresponds to
-        acceptor/donor pairs and the set of directed weighted edges $E$ represent
-        compatibility factors between donors and acceptors. If, for example,
+        donor/recipient pairs and the set of directed weighted edges $E$ represent
+        compatibility factors between donors and recipients. If, for example,
         patient 1 and kidney 2 are perfectly compatible (same blood type etc...)
         we give the edge (1,2) weight 1. If they are less compatible and the risk
         of failure of a transplant is higher, then we give the edge a lower weight.
@@ -154,7 +154,7 @@ table, th, td {
       </p>
       
       <p>
-        Now since an acceptor only needs to receive one kidney and a donor can
+        Now since an recipient only needs to receive one kidney and a donor can
         at most give one kidney, each vertex of the vertex the graph can be in
         at most one cycle. We therefore find all the cycles in which a given
         vertex $v$ is included. To impose the constraint, the sum of the binary
@@ -262,7 +262,7 @@ table, th, td {
           <circle cx="10" cy="10" r="8" stroke="#C91B26" stroke-width="3" fill="#F2671F" />
         </svg>
         ) where the outline represents the type of the donor and the fill
-        represents the type of the acceptor.
+        represents the type of the recipient.
       </p>
       <p>
         Each patient type is represented by a color. There are different
@@ -322,8 +322,8 @@ table, th, td {
         </table>
       </p>
       <p>
-        You can add acceptor/donor pairs by choosing an acceptor and donor
-        type and clicking "ADD".
+        You can add different types of donor/recipient pairs by clicking
+        the matrix in the top left corner.
       </p>
         
       <p>
