@@ -378,10 +378,8 @@ var spinner;
 //Width, height button width, menu size
 var width = 800;
 var height = 650;
-var bw = width/10;
-var menu = 80;
-//var colors = ["#a6cee3","#1f78b4","#b2df8a","#33a02c"];
-//var colors = ["#F2671F", "#C91B26", "#9C0F5F", "#60047A", "#160A47"];
+//var bw = width/10;
+//var menu = 80;
 var colors = d3.scale.category20();
 console.log(colors);
 
@@ -400,13 +398,16 @@ var svg = d3.select("#demoarea")
 var backgroundG = svg.append("g");
 
 // G objects for buttons
-var buttonsG1 = svg.append("g");
+var buttonsG = svg.append("g");
 var buttonsG2 = svg.append("g");
 var buttonsG3 = svg.append("g");
 
 // G objects for force layout
 var linksG = svg.append("g");
 var nodesG = svg.append("g");
+
+// G objects for clickable parts
+var clickableG = svg.append("g");
 
 // G object for spinner
 var spinnerG = svg.append("g");
@@ -421,7 +422,7 @@ var spinnerG = svg.append("g");
 var force = d3.layout.force()
     .charge(-400)
     .linkDistance(120)
-    .size([width, height + menu/2]);
+    .size([width, height ]);
 
 var nodes = force.nodes();
 var links = force.links();
@@ -554,11 +555,54 @@ function colorfill(colortype) {
 
 backgroundG.append("rect")
            .attr("x",0)
-           .attr("y",menu)
+           .attr("y",0)
            .attr("width", width)
            .attr("height", height)
-           .attr("fill", "rgb(250,250,250)");
+           .attr("fill", "white")
+           .attr("stroke", "black");
 
+var types = ["type0", "type1", "type2", "type3"];
+var buttonW = width/20;
+var buttonH = height/25;
+var buttonData = [];
+for (var i = 0; i < types.length; i++) {
+  for (var j = 0; j < types.length; j++) {
+    buttonData.push([types[i], types[j]]);
+  }
+}
+
+buttonsG.selectAll("rect")
+        .data(buttonData)
+        .enter()
+        .append("rect")
+        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
+        .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
+        .attr("height", buttonH)
+        .attr("width", buttonW)
+        .attr("stroke", "black")
+        .attr("fill", "none");
+
+for (var i = 0; i < types.length; i++) {
+  buttonsG.append("rect").attr("x", (i+1)*buttonW).attr("y",0).attr("fill", colorfill(types[i]))
+          .attr("height", buttonH).attr("width", buttonW);
+  buttonsG.append("rect").attr("y", (i+1)*buttonH).attr("x",0).attr("fill", colorfill(types[i]))
+          .attr("height", buttonH).attr("width", buttonW);
+}
+
+clickableG.selectAll("rect")
+          .data(buttonData)
+          .enter()
+          .append("rect")
+          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
+          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
+          .attr("height", buttonH)
+          .attr("width", buttonW)
+          .attr("opacity", 0)
+          .attr("id", function(d) { return d; })
+          .attr("fill", "black")
+          .attr("class", "add")
+          .on("mousedown", addPoint);
+/*
 var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
 var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
 
@@ -650,13 +694,17 @@ function buttonpress2() {
                  .attr("opacity", .9);
   console.log([typeD, typeA]);
 }
-
+*/
 function addPoint() {
   removeAllLinks();
+  var id = d3.select(this).attr("id");
+  console.log("id", id);
   var n = force.nodes().length; // New node id
   console.log('n',n);
-  addNode(n, typeD, typeA);
+  console.log('donor', id.slice(0,4));
+  addNode(n, id.slice(0,5), id.slice(6,11));
 }
+
 
 
 
