@@ -399,8 +399,7 @@ var backgroundG = svg.append("g");
 
 // G objects for buttons
 var buttonsG = svg.append("g");
-var buttonsG2 = svg.append("g");
-var buttonsG3 = svg.append("g");
+var countG = svg.append("g");
 
 // G objects for force layout
 var linksG = svg.append("g");
@@ -487,7 +486,7 @@ function start() {
         .attr("stroke", "rgb(200,200,200)")
         .attr("stroke-width", 3)
         .attr("fill", "white");
-  
+
   groups.append("text")
         .attr("x", -14)
         .attr("y", 7)
@@ -565,9 +564,12 @@ var types = ["type0", "type1", "type2", "type3"];
 var buttonW = width/20;
 var buttonH = height/25;
 var buttonData = [];
+var buttonCount = [];
+
 for (var i = 0; i < types.length; i++) {
   for (var j = 0; j < types.length; j++) {
     buttonData.push([types[i], types[j]]);
+    buttonCount.push(0);
   }
 }
 
@@ -585,9 +587,19 @@ buttonsG.selectAll("rect")
 for (var i = 0; i < types.length; i++) {
   buttonsG.append("rect").attr("x", (i+1)*buttonW).attr("y",0).attr("fill", colorfill(types[i]))
           .attr("height", buttonH).attr("width", buttonW);
+  buttonsG.append("text").attr("x", (i+1.5)*buttonW).attr("y",.7*buttonH).attr("fill", colorfill(types[i]))
+          .text("D");
   buttonsG.append("rect").attr("y", (i+1)*buttonH).attr("x",0).attr("fill", colorfill(types[i]))
           .attr("height", buttonH).attr("width", buttonW);
+  buttonsG.append("text").attr("y", (i+1.7)*buttonH).attr("x",.5*buttonW).attr("fill", colorfill(types[i]))
+          .text("R");        
 }
+
+buttonsG.selectAll("text").attr("fill", "white")
+                          .attr("font-size", 18)
+                          .attr("font-weight", 200)
+                          .attr("text-anchor", "middle")
+                          .attr("font-family", "Helvetica Neue");
 
 clickableG.selectAll("rect")
           .data(buttonData)
@@ -602,6 +614,16 @@ clickableG.selectAll("rect")
           .attr("fill", "black")
           .attr("class", "add")
           .on("mousedown", addPoint);
+
+function recount() {
+  countG.selectAll("text")
+        .data(buttonCount)
+        .enter()
+        .append("text")
+        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
+        .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
+        .text(function(d) { return d; });
+}
 /*
 var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
 var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
