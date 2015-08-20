@@ -378,10 +378,7 @@ var spinner;
 //Width, height button width, menu size
 var width = 800;
 var height = 650;
-//var bw = width/10;
-//var menu = 80;
 var colors = d3.scale.category20();
-console.log(colors);
 
 var svg = d3.select("#demoarea")
               .append("svg")
@@ -425,14 +422,6 @@ var force = d3.layout.force()
 
 var nodes = force.nodes();
 var links = force.links();
-
-addNode(0,"type2","type0");
-addNode(1,"type1","type3");
-addNode(2,"type2","type1");
-addNode(3,"type0","type3");
-addNode(4,"type3","type1");
-addNode(5,"type1","type0");
-
 
 // Functions needed for force layout interaction
 function addNode(id, acceptor, donor) {
@@ -548,7 +537,7 @@ function colorfill(colortype) {
 
 /*******************************
  *
- *CREATING BACKGROUND AND BUTTONS
+ *CREATE BACKGROUND AND BUTTONS
  *
  *******************************/
 
@@ -616,12 +605,14 @@ clickableG.selectAll("rect")
           .on("mousedown", addPoint);
 
 function recount() {
+  countG.selectAll("text").remove("text");
   countG.selectAll("text")
         .data(buttonCount)
         .enter()
         .append("text")
-        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
-        .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
+        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + 1.5*buttonW; })
+        .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + 1.7*buttonH;})
+        .attr("text-anchor", "middle")
         .text(function(d) { return d; });
 }
 /*
@@ -725,14 +716,16 @@ function addPoint() {
   console.log('n',n);
   console.log('donor', id.slice(0,4));
   addNode(n, id.slice(0,5), id.slice(6,11));
+  var index = parseInt(id[4]) + 4*parseInt(id[10]);
+  console.log('index', index);
+  buttonCount[parseInt(id[10]) + 4*parseInt(id[4])] += 1;
+  recount();
 }
-
-
 
 
 /*******************************
  *
- *        OPTIMIZATION
+ *        INITIAL DATA
  *
  *******************************/
 
@@ -745,10 +738,25 @@ var compatibility = [[1, type12, type13, type14],
                      [type13, type23, 1, type34],
                      [type14, type24, type34, 1]];
 
-// Initial types
-var typeD = "type0"; // Donor Type
-var typeA = "type1"; // Acceptor Type
+// Initial nodes
+addNode(0,"type2","type0"); buttonCount[0 + 4*2] += 1;
+addNode(1,"type1","type3"); buttonCount[3 + 4*1] += 1;
+addNode(2,"type2","type1"); buttonCount[1 + 4*2] += 1;
+addNode(3,"type0","type3"); buttonCount[3 + 4*0] += 1;
+addNode(4,"type3","type1"); buttonCount[1 + 4*3] += 1;
+addNode(5,"type1","type0"); buttonCount[0 + 4*1] += 1;
 
+recount();
+
+// Initial types
+//var typeD = "type0"; // Donor Type
+//var typeA = "type1"; // Acceptor Type
+
+/*******************************
+ *
+ *        OPTIMIZATION
+ *
+ *******************************/
 
 function compute() {
   // Show loading screen
