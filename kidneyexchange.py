@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from gurobipy import *
+import StringIO
 
 # Note that these are in in different format than data received
 vertices  = range(5)
@@ -8,6 +9,10 @@ edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
           (0,4) : 1, (4,0) : 1, (1,4) : 1, (4,1) : 1,
           (1,3) : 1, (3,1) : 1, (2,3) : 1, (3,2) : 1,
           (3,4) : 1, (4,3) : 1 }
+
+def mycallback(model, where):
+    if where == GRB.callback.MESSAGE:
+        print >>model.__output, model.cbGet(GRB.callback.MSG_STRING),
 
 def twoCycle(vertices, edges):
     '''
@@ -39,12 +44,17 @@ def threeCycle(vertices, edges):
                 threeCycles[(u,w,v)] = edges[(u,v)] + edges[(u,w)] + edges[(w,v)]
     return threeCycles
 
-def optimize(vertices, edges):
-    twoCycles = twoCycle(vertices,edges)
-    threeCycles = threeCycle(vertices,edges)
-
+def optimize(vertices, edges, output=False):
     m = Model()
 
+    if not output:
+        m.params.OutputFlag = 0
+
+    m.setParam('TimeLimit', 10)
+    
+    twoCycles = twoCycle(vertices,edges)
+    threeCycles = threeCycle(vertices,edges)
+    
     c = {}
 
     for cycle in twoCycles:
@@ -67,7 +77,13 @@ def optimize(vertices, edges):
                     quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
                     GRB.MAXIMIZE )
 
-    m.optimize()
+    output = StringIO.StringIO()
+    m.__output = output
+
+    m.optimize(mycallback)
+    
+    if (m.status != 2):
+        return ["error"]
 
     solution = []
 
@@ -75,20 +91,27 @@ def optimize(vertices, edges):
         if (c[cycle].X > .5):
             solution.append(cycle)
 
-    return solution
+    return [solution, output.getvalue()]
 
 # Because javascript does not have tuples, need to change data structures
 # We receive edges as {edgeweight: list of edges (as arrays)} and want to transform
 # this to {edge (as tuple): edgeweight}
-def transform(nodes, edges):
+def transform(nodes, edges, output=False):
     newNodes = range(len(nodes))
     newEdges = {}
     for edgeweight in edges:
         for edge in edges[edgeweight]:
             newEdges[(edge[0], edge[1])] = float(edgeweight)
-    print newEdges
-    return optimize(newNodes, newEdges)
+    return optimize(newNodes, newEdges, output)
 
-solution = optimize(vertices, edges)
+def handleoptimize(jsdict):
+    if 'nodes' in jsdict and 'edges' in jsdict:
+        solution = transform(jsdict['nodes'], jsdict['edges'])
+        return {'solution': solution }
 
-print solution
+if __name__ == '__main__':
+    import json
+    jsdict = json.load(sys.stdin)
+    jsdict = handleoptimize(jsdict)
+    print 'Content-Type: application/json\n\n'
+    print json.dumps(jsdict)

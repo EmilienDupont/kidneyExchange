@@ -14,17 +14,7 @@ if 'PORT' in os.environ:
 else:
     PORT = 8000
 
-
 import kidneyexchange
-
-def handleoptimize(jsdict):
-    if 'nodes' in jsdict and 'edges' in jsdict:
-        print 'Inside handle optimize!'
-        print jsdict['nodes']
-        print jsdict['edges']
-        solution = kidneyexchange.transform(jsdict['nodes'], jsdict['edges'])
-        print 'solution', solution
-        return {'solution': solution }
 
 class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
 
@@ -33,14 +23,14 @@ class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
     def do_POST(self):
-        if self.path == '/kidneyExchange':
+        if self.path == '/kidneyexchange.py':
             ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
             if ctype == 'application/json':
                 length = int(self.headers.getheader('content-length'))
                 data = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
                 for val in data:
                     jsdict = json.loads(val)
-                    jsdict = handleoptimize(jsdict)
+                    jsdict = kidneyexchange.handleoptimize(jsdict)
                     self.send_response(200)
                     self.send_header('Content-type', 'application/json')
                     self.end_headers()
