@@ -122,7 +122,7 @@ table, th, td {
         several ways</a> to formulate this problem as an integer program. We will
         use a <em>cycle cover</em> formulation.
       </p>
-      
+
       <p>
         Let $G$ be a graph where the set of vertices $V$ corresponds to
         donor/recipient pairs and the set of directed weighted edges $E$ represent
@@ -145,14 +145,14 @@ table, th, td {
               \end{array}\right.
         \]
       </p>
-      
+
       <p>
         The objective we seek to maximize is the total weight of the cover, i.e.
         \[
         \text{cycle cover weight} = \sum_{c \in C} w_c c
         \]
       </p>
-      
+
       <p>
         Now since an recipient only needs to receive one kidney and a donor can
         at most give one kidney, each vertex of the vertex the graph can be in
@@ -164,7 +164,7 @@ table, th, td {
         \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
         \]
       </p>
-      
+
       <p>
         So finally our optimization model becomes
         \[
@@ -175,7 +175,7 @@ table, th, td {
         \end{array}
         \]
       </p>
-      
+
     </div>
     <div class="example_section" id="implementation">
       <h2><a href="#implementation" name="implementation">Implementation</a></h2>
@@ -273,21 +273,21 @@ table, th, td {
         <tr>
         <td></td>
         <td>
-        <svg width="40" height="25" style="background-color:#F2671F;"></svg>
+        <svg width="40" height="25" style="background-color:#1f77b4;"></svg>
         </td>
         <td>
-        <svg width="40" height="25" style="background-color:#C91B26;"></svg>   
+        <svg width="40" height="25" style="background-color:#ff7f0e;"></svg>
         </td>
         <td>
-        <svg width="40" height="25" style="background-color:#9C0F5F;"></svg> 
+        <svg width="40" height="25" style="background-color:#2ca02c;"></svg>
         </td>
         <td>
-        <svg width="40" height="25" style="background-color:#60047A;"></svg>
+        <svg width="40" height="25" style="background-color:#d62728;"></svg>
         </td>
         </tr>
         <tbody>
         <tr><td>
-            <svg width="40" height="25" style="background-color:#F2671F;"></svg> 
+            <svg width="40" height="25" style="background-color:#1f77b4;"></svg>
             </td>
             <td>1</td>
             <td>0.5</td>
@@ -295,7 +295,7 @@ table, th, td {
             <td>0</td>
         </tr>
         <tr><td>
-            <svg width="40" height="25" style="background-color:#C91B26;"></svg>
+            <svg width="40" height="25" style="background-color:#ff7f0e;"></svg>
             </td>
             <td>0.5</td>
             <td>1</td>
@@ -303,7 +303,7 @@ table, th, td {
             <td>0.7</td>
         </tr>
         <tr><td>
-            <svg width="40" height="25" style="background-color:#9C0F5F;"></svg> 
+            <svg width="40" height="25" style="background-color:#2ca02c;"></svg>
             </td>
             <td>0.2</td>
             <td>0</td>
@@ -311,7 +311,7 @@ table, th, td {
             <td>0.6</td>
         </tr>
         <tr><td>
-            <svg width="40" height="25" style="background-color:#60047A;"></svg>  
+            <svg width="40" height="25" style="background-color:#d62728;"></svg>
             </td>
             <td>0</td>
             <td>0.7</td>
@@ -325,12 +325,12 @@ table, th, td {
         You can add different types of donor/recipient pairs by clicking
         the matrix in the top left corner.
       </p>
-        
+
       <p>
         To find the optimal kidney exchange using Gurobi, click "Compute".
         Drag the nodes around to make the visualization clearer.
       </p>
-      
+
       <div id="demoarea">
       </div>
       <button class="pure-button" onclick="compute()">Compute</button>
@@ -379,13 +379,14 @@ var spinner;
 var width = 800;
 var height = 650;
 var colors = d3.scale.category10();
+console.log(colors(0), colors(1), colors(2), colors(3));
 
 var svg = d3.select("#demoarea")
               .append("svg")
               .attr("width", width)
               .attr("height", height);
 
-              
+
 /*******************************
  *
  *      CREATING G OBJECTS
@@ -444,7 +445,7 @@ function start() {
 
   var link = linksG.selectAll(".link")
                 .data(links, function(d) { return d.source.id + "-" + d.target.id; });
-  
+
   link.enter().append("path")
       .attr("d", function(d) {
             console.log('d', d);
@@ -461,13 +462,13 @@ function start() {
       .attr("class", "link")
       .style("stroke-width", function(d) { return Math.sqrt(d.value); })
       .attr("fill", "none");
-  
+
   link.exit().remove();
   var groups = nodesG.selectAll("g")
                      .data(nodes, function(d) { return d.id;});
-  
+
   groups.enter().append("g").call(force.drag);
-  
+
   groups.append("circle")
         .attr("cx", 0)
         .attr("cy", 0)
@@ -481,29 +482,29 @@ function start() {
         .attr("y", 7)
         .text("D")
         .style("fill", function(d) { return colorfill(d.donor); });
-  
+
   groups.append("text")
         .attr("x", 2)
         .attr("y", 7)
         .text("R")
         .style("fill", function(d) { return colorfill(d.acceptor); });
-  
+
   groups.exit().remove();
   /*
   var node = nodesG.selectAll(".node")
                 .data(nodes, function(d) { return d.id;});
-  
+
   node.enter().append("circle")
       .attr("class", "node")
       .attr("r", 8)
       .style("fill", function(d) { return colorfill(d.donor); })
       .style("stroke", function(d) { return colorfill(d.acceptor)})
       .call(force.drag);
-    
-  
+
+
   node.exit().remove();
   */
-  force.on("tick", function() { 
+  force.on("tick", function() {
         link.attr("d", function(d) {
         var dx = d.target.x - d.source.x,
             dy = d.target.y - d.source.y,
@@ -581,7 +582,7 @@ for (var i = 0; i < types.length; i++) {
   buttonsG.append("rect").attr("y", (i+1)*buttonH).attr("x",0).attr("fill", colorfill(types[i]))
           .attr("height", buttonH).attr("width", buttonW);
   buttonsG.append("text").attr("y", (i+1.7)*buttonH).attr("x",.5*buttonW).attr("fill", colorfill(types[i]))
-          .text("R");        
+          .text("R");
 }
 
 buttonsG.selectAll("text").attr("fill", "white")
@@ -615,99 +616,7 @@ function recount() {
         .attr("text-anchor", "middle")
         .text(function(d) { return d; });
 }
-/*
-var buttondata1 = [bw, 2*bw, 3*bw, 4*bw];
-var buttondata2 = [6*bw, 7*bw, 8*bw, 9*bw];
 
-// Create graphics related to buttons
-buttonsG1.append("rect")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("width", width)
-        .attr("height", menu)
-        .attr("fill", colors[4])
-        .attr("opacity", .7)
-        .attr("stroke", "black");
-
-buttonsG1.append("text")
-        .attr("x", width/4)
-        .attr("y", 25)
-        .text("DONOR");
-
-buttonsG1.append("text")
-        .attr("x", 3*width/4)
-        .attr("y", 25)
-        .text("ACCEPTOR");
-
-buttonsG1.selectAll("text")
-       .attr("font-size", "25px")
-       .attr("fill", "white")
-       .attr("text-anchor", "middle");
-
-var buttons1 = buttonsG1.selectAll("circle")
-          .data(buttondata1)
-          .enter()
-          .append("circle")
-          .attr("cx", function(d) { return d; })
-          .attr("cy", 55)
-          .attr("r", 15)
-          .attr("class", function(d,i) { return "type" + i % 4 ; })
-          .attr("fill", function(d,i) { return colors(i % 4);})
-          .attr("stroke-width", function(d,i) { if (i === 0) { return 3; } else { return 1; } })
-          .attr("opacity", function(d,i) { if (i === 0) { return 0.9; } else { return .3; } })
-          .attr("stroke", "black")
-          .on("mousedown", buttonpress1);
-
-var buttons2 = buttonsG2.selectAll("circle")
-          .data(buttondata2)
-          .enter()
-          .append("circle")
-          .attr("cx", function(d) { return d; })
-          .attr("cy", 55)
-          .attr("r", 15)
-          .attr("class", function(d,i) { return "type" + i % 4 ; })
-          .attr("fill", function(d,i) { return colors(i % 4);})
-          .attr("stroke-width", function(d,i) { if (i === 1) { return 3; } else { return 1; } })
-          .attr("opacity", function(d,i) { if (i === 1) { return 0.9; } else { return .3; } })
-          .attr("stroke", "black")
-          .on("mousedown", buttonpress2);
-
-buttonsG3.append("rect")
-         .attr("class", "add")
-         .attr("x", width/2 - 50)
-         .attr("y", 25)
-         .attr("height", 50)
-         .attr("width", 100)
-         .attr("stroke", "none")
-         .attr("fill", colors[4])
-         .on("mousedown", addPoint);
-
-buttonsG3.append("text")
-        .text("ADD")
-        .attr("x", width/2)
-        .attr("y", 60)
-        .attr("font-size", "25px")
-        .attr("fill", "white")
-        .attr("text-anchor", "middle");
-
-function buttonpress1() {
-  typeD = d3.select(this).attr("class");
-  buttons1.attr("stroke-width", 1)
-          .attr("opacity", .3);
-  d3.select(this).attr("stroke-width", 3)
-                 .attr("opacity", .9);
-  console.log([typeD, typeA]);
-}
-
-function buttonpress2() {
-  typeA = d3.select(this).attr("class");
-  buttons2.attr("stroke-width", 1)
-          .attr("opacity", .3);
-  d3.select(this).attr("stroke-width", 3)
-                 .attr("opacity", .9);
-  console.log([typeD, typeA]);
-}
-*/
 function addPoint() {
   removeAllLinks();
   var id = d3.select(this).attr("id");
@@ -748,10 +657,6 @@ addNode(5,"type1","type0"); buttonCount[0 + 4*1] += 1;
 
 recount();
 
-// Initial types
-//var typeD = "type0"; // Donor Type
-//var typeA = "type1"; // Acceptor Type
-
 /*******************************
  *
  *        OPTIMIZATION
@@ -775,13 +680,13 @@ function compute() {
           .text("Computing...");
   var target = document.getElementById('demoarea');
   spinner = new Spinner({left: '375%'}).spin(target);
-  
+
   var vertices = [];
   var edges = { 1 : [], 0.5 : [], 0.2 : [],
                 0.7 : [], 0.6 : []};
 
   var nonzeros = 0;
-  
+
   var numNodes = force.nodes().length;
   var nodes = force.nodes();
 
@@ -825,7 +730,7 @@ function compute() {
 function serverResponse(error, data) {
    console.log('serverResponse');
    console.log('data', data);
-   
+
    // Remove loading screen
    spinnerG.selectAll("rect").remove("rect");
    spinnerG.selectAll("text").remove("text");
@@ -842,9 +747,9 @@ function serverResponse(error, data) {
         }
         var solution = solutionTemp[0];
         var logMsg = solutionTemp[1]; // Log message to display
-        
+
         d3.select('#logfile').html(logMsg);
-        
+
         removeAllLinks();
         // Add the edges of the cycles to graph.links
         for (var i = 0; i < solution.length; i++) {
