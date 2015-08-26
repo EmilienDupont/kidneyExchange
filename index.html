@@ -30,6 +30,16 @@ table, th, td {
   stroke-width: 3;
 }
 
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
 </style>
 <body>
   <ul id="nav">
@@ -620,7 +630,8 @@ buttonsG.selectAll("text").attr("fill", "white")
                           .attr("font-size", 18)
                           .attr("font-weight", 200)
                           .attr("text-anchor", "middle")
-                          .attr("font-family", "Helvetica Neue");
+                          .attr("font-family", "Helvetica Neue")
+                          .attr("class", "noselect");;
 
 clickableG.selectAll("rect")
           .data(buttonData)
@@ -661,8 +672,9 @@ buttonSymG.selectAll("text")
           .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - .5*clickW); })
           .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + clickH;})
           .attr("fill", "green")
-          .text("+")
-          .attr("text-anchor", "middle");
+          .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return "+";} })
+          .attr("text-anchor", "middle")
+          .attr("class", "noselect");
 
 buttonSym2G.selectAll("text")
           .data(buttonData)
@@ -671,8 +683,9 @@ buttonSym2G.selectAll("text")
           .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - .5*clickW); })
           .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + 2*clickH;})
           .attr("fill", "red")
-          .text("-")
-          .attr("text-anchor", "middle");
+          .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return "-";} })
+          .attr("text-anchor", "middle")
+          .attr("class", "noselect");
 
 function recount() {
   countG.selectAll("text").remove("text");
@@ -680,9 +693,10 @@ function recount() {
         .data(buttonCount)
         .enter()
         .append("text")
-        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + 1.5*buttonW; })
+        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + 1.5*buttonW - clickW/2; })
         .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + 1.7*buttonH;})
         .attr("text-anchor", "middle")
+        .attr("class", "noselect")
         .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return d;} });
 }
 
