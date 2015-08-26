@@ -31,7 +31,6 @@ table, th, td {
 }
 
 .link {
-  stroke: #999;
   stroke-opacity: .6;
 }
 
@@ -469,7 +468,6 @@ function removeAllLinks() {
 }
 
 function start() {
-  console.log("in start()");
 
   var link = linksG.selectAll(".link")
                 .data(links, function(d) { return d.source.id + "-" + d.target.id; });
@@ -489,7 +487,11 @@ function start() {
       })
       .attr("class", "link")
       .style("stroke-width", function(d) { return Math.sqrt(d.value); })
-      .attr("fill", "none");
+      .style("stroke", function(d) { var src = d.source;
+                                     var donortype = nodes[src].donor;
+                                     console.log('donortype', donortype);
+                                     return colorfill(donortype);} )
+      .style("fill", "none");
 
   link.exit().remove();
   /*
