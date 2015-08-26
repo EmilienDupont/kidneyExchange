@@ -30,10 +30,6 @@ table, th, td {
   stroke-width: 3;
 }
 
-.link {
-  stroke-opacity: .6;
-}
-
 </style>
 <body>
   <ul id="nav">
@@ -404,6 +400,8 @@ var nodesG = svg.append("g");
 
 // G objects for buttons
 var buttonsG = svg.append("g");
+var buttonSymG = svg.append("g");
+var buttonSym2G = svg.append("g");
 var countG = svg.append("g");
 
 // G objects for clickable parts
@@ -655,6 +653,26 @@ clickable2G.selectAll("rect")
           .attr("fill", "red")
           .attr("class", "add")
           .on("mousedown", removePoint);
+
+buttonSymG.selectAll("text")
+          .data(buttonData)
+          .enter()
+          .append("text")
+          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - .5*clickW); })
+          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + clickH;})
+          .attr("fill", "green")
+          .text("+")
+          .attr("text-anchor", "middle");
+
+buttonSym2G.selectAll("text")
+          .data(buttonData)
+          .enter()
+          .append("text")
+          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - .5*clickW); })
+          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + 2*clickH;})
+          .attr("fill", "red")
+          .text("-")
+          .attr("text-anchor", "middle");
 
 function recount() {
   countG.selectAll("text").remove("text");
