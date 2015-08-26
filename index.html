@@ -429,7 +429,7 @@ var nodes = force.nodes();
 var links = force.links();
 
 // Functions needed for force layout interaction
-function addNode(id, acceptor, donor) {
+function addNode(id, donor, acceptor) {
   console.log('nodeNumber',nodeNumber);
   nodeNumber += 1;
   nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
@@ -439,15 +439,20 @@ function addNode(id, acceptor, donor) {
 function removeNode(donor, acceptor) {
   var idx = -1;
   for (var i = 0; i < nodes.length; i++) {
+    console.log('donor', nodes[i].donor, donor);
     if (nodes[i].donor === donor && nodes[i].acceptor === acceptor) {
+      console.log('node found', i);
       idx = i;
       break;
-    } else {
-      return;
     }
   }
-  nodes.splice(idx, 1);
-  start();
+  if (idx < 0) {
+    console.log('no node');
+    return;
+  } else {
+    nodes.splice(idx, 1);
+    start();
+  }
 }
 
 function addLink(source, target, value) {
@@ -518,8 +523,8 @@ function start() {
   node.enter().append("circle")
       .attr("class", "node")
       .attr("r", 8)
-      .style("fill", function(d) { return colorfill(d.donor); })
-      .style("stroke", function(d) { return colorfill(d.acceptor)})
+      .style("fill", function(d) { return colorfill(d.acceptor); })
+      .style("stroke", function(d) { return colorfill(d.donor)})
       .call(force.drag);
 
   node.exit().remove();
@@ -643,8 +648,8 @@ function recount() {
 function addPoint() {
   removeAllLinks();
   var id = d3.select(this).attr("id");
-  console.log('donor', id.slice(0,4));
-  addNode(nodeNumber, id.slice(0,5), id.slice(6,11));
+  console.log('acceptor', id.slice(0,4));
+  addNode(nodeNumber, id.slice(6,11), id.slice(0,5));
   var index = parseInt(id[4]) + 4*parseInt(id[10]);
   console.log('index', index);
   buttonCount[parseInt(id[10]) + 4*parseInt(id[4])] += 1;
@@ -653,13 +658,6 @@ function addPoint() {
 
 function removePoint() {
   removeAllLinks();
-  var id = d3.select(this).attr("id");
-  console.log('donor', id.slice(0,4));
-  addNode(nodeNumber, id.slice(0,5), id.slice(6,11));
-  var index = parseInt(id[4]) + 4*parseInt(id[10]);
-  console.log('index', index);
-  buttonCount[parseInt(id[10]) + 4*parseInt(id[4])] += 1;
-  recount();
 }
 
 
@@ -679,13 +677,13 @@ var compatibility = [[1, type12, type13, type14],
                      [type14, type24, type34, 1]];
 
 // Initial nodes
-addNode(0,"type2","type0"); buttonCount[0 + 4*2] += 1;
-addNode(1,"type1","type3"); buttonCount[3 + 4*1] += 1;
-addNode(2,"type2","type1"); buttonCount[1 + 4*2] += 1;
-addNode(3,"type0","type3"); buttonCount[3 + 4*0] += 1;
-addNode(4,"type3","type1"); buttonCount[1 + 4*3] += 1;
-addNode(5,"type1","type0"); buttonCount[0 + 4*1] += 1;
-removeNode("type1","type0"); buttonCount[0 + 4*1] -= 1;
+addNode(0,"type2","type0"); buttonCount[2 + 4*0] += 1;
+addNode(1,"type1","type3"); buttonCount[1 + 4*3] += 1;
+addNode(2,"type2","type1"); buttonCount[2 + 4*1] += 1;
+addNode(3,"type0","type3"); buttonCount[0 + 4*3] += 1;
+addNode(4,"type3","type1"); buttonCount[3 + 4*1] += 1;
+addNode(5,"type1","type0"); buttonCount[1 + 4*0] += 1;
+removeNode("type1","type0"); buttonCount[1 + 4*0] -= 1;
 
 recount();
 
