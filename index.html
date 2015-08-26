@@ -13,6 +13,10 @@
 <link rel="stylesheet" href="http://examples.gurobi.com/base.css">
 <style>
 
+.tabinput {
+ width: 40px;
+}
+
 rect.add:hover {
   opacity: .5;
 }
@@ -379,13 +383,13 @@ var spinner;
 var width = 800;
 var height = 650;
 var colors = d3.scale.category10();
-console.log(colors(0), colors(1), colors(2), colors(3));
 
 var svg = d3.select("#demoarea")
               .append("svg")
               .attr("width", width)
               .attr("height", height);
 
+var nodeNumber = 0;
 
 /*******************************
  *
@@ -426,13 +430,29 @@ var links = force.links();
 
 // Functions needed for force layout interaction
 function addNode(id, acceptor, donor) {
-    nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
-    start();
+  console.log('nodeNumber',nodeNumber);
+  nodeNumber += 1;
+  nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
+  start();
+}
+
+function removeNode(donor, acceptor) {
+  var idx = -1;
+  for (var i = 0; i < nodes.length; i++) {
+    if (nodes[i].donor === donor && nodes[i].acceptor === acceptor) {
+      idx = i;
+      break;
+    } else {
+      return;
+    }
+  }
+  nodes.splice(idx, 1);
+  start();
 }
 
 function addLink(source, target, value) {
-    links.push({"source":source,"target":target,"value":value});
-    start();
+  links.push({"source":source,"target":target,"value":value});
+  start();
 }
 
 function removeAllLinks() {
@@ -464,6 +484,7 @@ function start() {
       .attr("fill", "none");
 
   link.exit().remove();
+  /*
   var groups = nodesG.selectAll("g")
                      .data(nodes, function(d) { return d.id;});
 
@@ -489,8 +510,8 @@ function start() {
         .text("R")
         .style("fill", function(d) { return colorfill(d.acceptor); });
 
-  groups.exit().remove();
-  /*
+  groups.exit().remove(); */
+
   var node = nodesG.selectAll(".node")
                 .data(nodes, function(d) { return d.id;});
 
@@ -501,9 +522,8 @@ function start() {
       .style("stroke", function(d) { return colorfill(d.acceptor)})
       .call(force.drag);
 
-
   node.exit().remove();
-  */
+
   force.on("tick", function() {
         link.attr("d", function(d) {
         var dx = d.target.x - d.source.x,
@@ -516,14 +536,15 @@ function start() {
             d.target.x + "," +
             d.target.y;
         });
-        /*
+
         node.attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; }); */
+            .attr("cy", function(d) { return d.y; });
+        /*
         groups.attr("transform", function(d, i) {
             var x = d.x;
             var y = d.y;
             return "translate(" + [x,y] + ")";
-        })
+        }) */
 
   })
 
@@ -597,8 +618,10 @@ clickableG.selectAll("rect")
           .append("rect")
           .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
           .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
-          .attr("height", buttonH)
-          .attr("width", buttonW)
+          .attr("height", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
+                                        { return 0; } else { return buttonH; } })
+          .attr("width", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
+                                        { return 0; } else { return buttonW; } })
           .attr("opacity", 0)
           .attr("id", function(d) { return d; })
           .attr("fill", "black")
@@ -614,17 +637,25 @@ function recount() {
         .attr("x", function(d,i) { return (i % types.length)*(buttonW) + 1.5*buttonW; })
         .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + 1.7*buttonH;})
         .attr("text-anchor", "middle")
-        .text(function(d) { return d; });
+        .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return d;} });
 }
 
 function addPoint() {
   removeAllLinks();
   var id = d3.select(this).attr("id");
-  console.log("id", id);
-  var n = force.nodes().length; // New node id
-  console.log('n',n);
   console.log('donor', id.slice(0,4));
-  addNode(n, id.slice(0,5), id.slice(6,11));
+  addNode(nodeNumber, id.slice(0,5), id.slice(6,11));
+  var index = parseInt(id[4]) + 4*parseInt(id[10]);
+  console.log('index', index);
+  buttonCount[parseInt(id[10]) + 4*parseInt(id[4])] += 1;
+  recount();
+}
+
+function removePoint() {
+  removeAllLinks();
+  var id = d3.select(this).attr("id");
+  console.log('donor', id.slice(0,4));
+  addNode(nodeNumber, id.slice(0,5), id.slice(6,11));
   var index = parseInt(id[4]) + 4*parseInt(id[10]);
   console.log('index', index);
   buttonCount[parseInt(id[10]) + 4*parseInt(id[4])] += 1;
@@ -654,6 +685,7 @@ addNode(2,"type2","type1"); buttonCount[1 + 4*2] += 1;
 addNode(3,"type0","type3"); buttonCount[3 + 4*0] += 1;
 addNode(4,"type3","type1"); buttonCount[1 + 4*3] += 1;
 addNode(5,"type1","type0"); buttonCount[0 + 4*1] += 1;
+removeNode("type1","type0"); buttonCount[0 + 4*1] -= 1;
 
 recount();
 
