@@ -409,6 +409,7 @@ var countG = svg.append("g");
 
 // G objects for clickable parts
 var clickableG = svg.append("g");
+var clickable2G = svg.append("g");
 
 // G object for spinner
 var spinnerG = svg.append("g");
@@ -432,6 +433,7 @@ var links = force.links();
 function addNode(id, donor, acceptor) {
   console.log('nodeNumber',nodeNumber);
   nodeNumber += 1;
+  buttonCount[parseInt(donor[4]) + 4*parseInt(acceptor[4])] += 1;
   nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
   start();
 }
@@ -450,6 +452,7 @@ function removeNode(donor, acceptor) {
     console.log('no node');
     return;
   } else {
+    buttonCount[parseInt(donor[4]) + 4*parseInt(acceptor[4])] -= 1;
     nodes.splice(idx, 1);
     start();
   }
@@ -579,6 +582,8 @@ backgroundG.append("rect")
 var types = ["type0", "type1", "type2", "type3"];
 var buttonW = width/20;
 var buttonH = height/25;
+var clickW = buttonW/3;
+var clickH = buttonH/2;
 var buttonData = [];
 var buttonCount = [];
 
@@ -621,17 +626,33 @@ clickableG.selectAll("rect")
           .data(buttonData)
           .enter()
           .append("rect")
-          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
+          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - clickW); })
           .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
           .attr("height", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
-                                        { return 0; } else { return buttonH; } })
+                                        { return 0; } else { return clickH; } })
           .attr("width", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
-                                        { return 0; } else { return buttonW; } })
+                                        { return 0; } else { return clickW; } })
           .attr("opacity", 0)
           .attr("id", function(d) { return d; })
-          .attr("fill", "black")
+          .attr("fill", "green")
           .attr("class", "add")
           .on("mousedown", addPoint);
+
+clickable2G.selectAll("rect")
+          .data(buttonData)
+          .enter()
+          .append("rect")
+          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - clickW); })
+          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + clickH;})
+          .attr("height", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
+                                        { return 0; } else { return clickH; } })
+          .attr("width", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
+                                        { return 0; } else { return clickW; } })
+          .attr("opacity", 0)
+          .attr("id", function(d) { return d; })
+          .attr("fill", "red")
+          .attr("class", "add")
+          .on("mousedown", removePoint);
 
 function recount() {
   countG.selectAll("text").remove("text");
@@ -648,16 +669,15 @@ function recount() {
 function addPoint() {
   removeAllLinks();
   var id = d3.select(this).attr("id");
-  console.log('acceptor', id.slice(0,4));
   addNode(nodeNumber, id.slice(6,11), id.slice(0,5));
-  var index = parseInt(id[4]) + 4*parseInt(id[10]);
-  console.log('index', index);
-  buttonCount[parseInt(id[10]) + 4*parseInt(id[4])] += 1;
   recount();
 }
 
 function removePoint() {
   removeAllLinks();
+  var id = d3.select(this).attr("id");
+  removeNode(id.slice(6,11), id.slice(0,5));
+  recount();
 }
 
 
@@ -677,13 +697,12 @@ var compatibility = [[1, type12, type13, type14],
                      [type14, type24, type34, 1]];
 
 // Initial nodes
-addNode(0,"type2","type0"); buttonCount[2 + 4*0] += 1;
-addNode(1,"type1","type3"); buttonCount[1 + 4*3] += 1;
-addNode(2,"type2","type1"); buttonCount[2 + 4*1] += 1;
-addNode(3,"type0","type3"); buttonCount[0 + 4*3] += 1;
-addNode(4,"type3","type1"); buttonCount[3 + 4*1] += 1;
-addNode(5,"type1","type0"); buttonCount[1 + 4*0] += 1;
-removeNode("type1","type0"); buttonCount[1 + 4*0] -= 1;
+addNode(0,"type2","type0");
+addNode(1,"type1","type3");
+addNode(2,"type2","type1");
+addNode(3,"type0","type3");
+addNode(4,"type3","type1");
+addNode(5,"type1","type0");
 
 recount();
 
