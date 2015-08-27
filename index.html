@@ -790,6 +790,10 @@ recount();
  *******************************/
 
 function compute() {
+  if (force.nodes().length < 2) {
+    alert("Not enough donor/recipient pairs. Add more nodes!");
+    return;
+  }
   // Show loading screen
   spinnerG.append("rect")
           .attr("x", 0).attr("y", 0)
@@ -836,14 +840,7 @@ function compute() {
   console.log('edges', edges);
 
   if (nonzeros === 0) {
-    console.log("No compatible acceptor donor pairs!");
-    solutionG.append("text")
-             .text("No compatible acceptor donor pairs!")
-             .attr("x", centerx)
-             .attr("y", centery)
-             .attr("font-size", "25px")
-             .attr("fill", "white")
-             .attr("text-anchor", "middle");
+    alert("No compatible donor recipient pairs! Add more nodes.");
     return;
   }
 
@@ -877,6 +874,11 @@ function serverResponse(error, data) {
         d3.select('#logfile').html(logMsg);
 
         removeAllLinks();
+
+        if (solution.length < 1) {
+          alert("No compatible donor recipient pairs! Add more nodes.");
+          return;
+        }
         // Add the edges of the cycles to graph.links
         for (var i = 0; i < solution.length; i++) {
           cycle = solution[i];
