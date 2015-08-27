@@ -188,72 +188,72 @@ table, th, td {
         Gurobi's Python interface:
       </p>
       <examplecode>
-      from gurobipy import *
+from gurobipy import *
 
-      vertices  = range(5)
-      edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
-                (0,4) : 1, (4,0) : 1, (1,4) : 1, (4,1) : 1,
-                (1,3) : 1, (3,1) : 1, (2,3) : 1, (3,2) : 1,
-                (3,4) : 1, (4,3) : 1 }
+vertices  = range(5)
+edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
+          (0,4) : 1, (4,0) : 1, (1,4) : 1, (4,1) : 1,
+          (1,3) : 1, (3,1) : 1, (2,3) : 1, (3,2) : 1,
+          (3,4) : 1, (4,3) : 1 }
 
-      def twoCycle(vertices, edges):
-          '''
-          Returns a dictionary of 2 cycles. Keys: (u,v), Value: weight of cycle
-          Note that u < v to not double count cycles.
-          '''
-          twoCycles = {}
-          for edge in edges:
-              u = edge[0]
-              v = edge[1]
-              if (u < v and (v,u) in edges):
-                  twoCycles[(u,v)] = edges[(u,v)] + edges[(v,u)]
-          return twoCycles
+def twoCycle(vertices, edges):
+    '''
+    Returns a dictionary of 2 cycles. Keys: (u,v), Value: weight of cycle
+    Note that u < v to not double count cycles.
+    '''
+    twoCycles = {}
+    for edge in edges:
+        u = edge[0]
+        v = edge[1]
+        if (u < v and (v,u) in edges):
+            twoCycles[(u,v)] = edges[(u,v)] + edges[(v,u)]
+    return twoCycles
 
-      def threeCycle(vertices, edges):
-          '''
-          Returns a dictionary of 3 cycles. Keys: (u,w,v), Value: weight of cycle
-          Note that w is always the lowest numbered vertex to not double
-          (or triple) count cycles.
-          '''
-          threeCycles = {}
-          for edge in edges:
-              u = edge[0]
-              v = edge[1]
-              for w in vertices:
-                  if (w >= u or w >= v ):
-                      break
-                  if ( (u,w) in edges and (w,v) in edges ):
-                      threeCycles[(u,w,v)] = edges[(u,v)] + edges[(u,w)] + edges[(w,v)]
-          return threeCycles
+def threeCycle(vertices, edges):
+    '''
+    Returns a dictionary of 3 cycles. Keys: (u,w,v), Value: weight of cycle
+    Note that w is always the lowest numbered vertex to not double
+    (or triple) count cycles.
+    '''
+    threeCycles = {}
+    for edge in edges:
+        u = edge[0]
+        v = edge[1]
+        for w in vertices:
+            if (w >= u or w >= v ):
+                break
+            if ( (u,w) in edges and (w,v) in edges ):
+                threeCycles[(u,w,v)] = edges[(u,v)] + edges[(u,w)] + edges[(w,v)]
+    return threeCycles
 
-      twoCycles = twoCycle(vertices,edges)
-      threeCycles = threeCycle(vertices,edges)
+twoCycles = twoCycle(vertices,edges)
+threeCycles = threeCycle(vertices,edges)
 
-      m = Model()
+m = Model()
 
-      c = {}
+c = {}
 
-      for cycle in twoCycles:
-          c[cycle] = m.addVar(vtype=GRB.BINARY, name="c_%s" % str(cycle))
+for cycle in twoCycles:
+    c[cycle] = m.addVar(vtype=GRB.BINARY, name="c_%s" % str(cycle))
 
-      for cycle in threeCycles:
-          c[cycle] = m.addVar(vtype=GRB.BINARY, name="c_%s" % str(cycle))
+for cycle in threeCycles:
+    c[cycle] = m.addVar(vtype=GRB.BINARY, name="c_%s" % str(cycle))
 
-      m.update()
+m.update()
 
-      for v in vertices:
-        constraint = []
-        for cycle in c:
-            if (v in cycle):
-                constraint.append(c[cycle])
-        if constraint:
-            m.addConstr( quicksum( constraint[i] for i in range(len(constraint)) ) <= 1 , name="v%d" % v)
+for v in vertices:
+  constraint = []
+  for cycle in c:
+      if (v in cycle):
+          constraint.append(c[cycle])
+  if constraint:
+      m.addConstr( quicksum( constraint[i] for i in range(len(constraint)) ) <= 1 , name="v%d" % v)
 
-      m.setObjective( quicksum( c[cycle] * twoCycles[cycle] for cycle in twoCycles ) +
-                      quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
-                      GRB.MAXIMIZE )
+m.setObjective( quicksum( c[cycle] * twoCycles[cycle] for cycle in twoCycles ) +
+                quicksum( c[cycle] * threeCycles[cycle] for cycle in threeCycles ),
+                GRB.MAXIMIZE )
 
-      m.optimize()
+m.optimize()
       </examplecode>
     </div>
     <div class="example_section" id="demo">
@@ -327,10 +327,17 @@ table, th, td {
       <p>
         Patient/donor pairs are represented by nodes
         <svg height="20" width="20">
-          <circle cx="10" cy="10" r="8" stroke="#1f77b4" stroke-width="4" fill="#ff7f0e" />
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="50%" style="stop-color:#1f77b4;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#ff7f0e;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <circle cx="10" cy="10" r="8" stroke="black" stroke-width="2" fill="url(#grad1)" />
         </svg>
-         where the <em>outline</em> represents the type of the <em>donor</em>
-         and the <em>fill</em> represents the type of the <em>recipient</em>.
+
+         where the <em>left</em> side of the circle represents the type of the <em>recipient</em>
+         and the <em>right</em> side represents the type of the <em>donor</em>.
       </p>
 
       <p>
@@ -397,6 +404,7 @@ var svg = d3.select("#demoarea")
               .attr("height", height);
 
 var colorGradients = [];
+
 // Each row is a recipient, each column is a donor
 for (var i = 0; i < 4; i++) {
   var row = [];
@@ -411,11 +419,6 @@ for (var i = 0; i < 4; i++) {
   }
   colorGradients.push(row);
 }
-/*
-var grad00 = svg.append("defs").append("linearGradient").attr("id", "grad00")
-              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
-grad00.append("stop").attr("offset", "50%").style("stop-color", "red");
-grad00.append("stop").attr("offset", "50%").style("stop-color", "blue"); */
 
 var nodeNumber = 0;
 
