@@ -454,7 +454,7 @@ var spinnerG = svg.append("g");
 var force = d3.layout.force()
     .charge(-200)
     .linkDistance(80)
-    .size([width, height ]);
+    .size([width, height]);
 
 var nodes = force.nodes();
 var links = force.links();
@@ -771,6 +771,12 @@ addNode(2,"type2","type1");
 addNode(3,"type0","type3");
 addNode(4,"type3","type1");
 addNode(5,"type1","type0");
+addNode(6,"type2","type3");
+addNode(7,"type1","type0");
+addNode(8,"type3","type0");
+addNode(9,"type2","type3");
+addNode(10,"type0","type2");
+addNode(11,"type1","type2");
 
 recount();
 
