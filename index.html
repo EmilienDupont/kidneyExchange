@@ -396,6 +396,27 @@ var svg = d3.select("#demoarea")
               .attr("width", width)
               .attr("height", height);
 
+var colorGradients = [];
+// Each row is a recipient, each column is a donor
+for (var i = 0; i < 4; i++) {
+  var row = [];
+  for (var j = 0; j < 4; j++) {
+    if (i !== j) {
+      var id = "grad" + String(i) + String(j);
+      row.push(svg.append("defs").append("linearGradient").attr("id", id)
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%"));
+      row[row.length-1].append("stop").attr("offset", "50%").style("stop-color", colors(i));
+      row[row.length-1].append("stop").attr("offset", "50%").style("stop-color", colors(j));
+    }
+  }
+  colorGradients.push(row);
+}
+/*
+var grad00 = svg.append("defs").append("linearGradient").attr("id", "grad00")
+              .attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+grad00.append("stop").attr("offset", "50%").style("stop-color", "red");
+grad00.append("stop").attr("offset", "50%").style("stop-color", "blue"); */
+
 var nodeNumber = 0;
 
 /*******************************
@@ -537,10 +558,10 @@ function start() {
 
   node.enter().append("circle")
       .attr("class", "node")
-      .attr("r", 10)
-      .attr("stroke-width", 5)
-      .style("fill", function(d) { return colorfill(d.acceptor); })
-      .style("stroke", function(d) { return colorfill(d.donor)})
+      .attr("r", 12)
+      .attr("stroke-width", 2)
+      .style("fill", function(d) { return colorgradient(d.acceptor, d.donor);})
+      .style("stroke", function(d) { return "black";})
       .call(force.drag);
 
   node.exit().remove();
@@ -572,9 +593,15 @@ function start() {
   force.start();
 }
 
-// Function to color the nodes
 function colorfill(colortype) {
   return colors(parseInt(colortype[4])); // E.g. if "type0" return colors(0)
+}
+
+function colorgradient(colortype1, colortype2) {
+  var i = colortype1[4];
+  var j = colortype2[4];
+  console.log('color',"url(#grad" + i + j + ")");
+  return "url(#grad" + i + j + ")"; // E.g. if "type0" return colors(0)
 }
 
 
