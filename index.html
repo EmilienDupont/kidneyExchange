@@ -39,6 +39,11 @@ table, th, td {
     cursor: default;
 }
 
+.node {
+  stroke-width: 2px;
+  stroke: black;
+}
+
 </style>
 <body>
   <ul id="nav">
@@ -582,9 +587,7 @@ function start() {
   node.enter().append("circle")
       .attr("class", "node")
       .attr("r", 12)
-      .attr("stroke-width", 2)
       .style("fill", function(d) { return colorgradient(d.acceptor, d.donor);})
-      .style("stroke", "black")
       .call(force.drag);
 
   node.exit().remove();
