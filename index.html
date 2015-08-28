@@ -857,7 +857,7 @@ function compute() {
     return;
   }
 
-  d3.json('/kidneyexchange.py')
+  d3.json('kidneyexchange.py')
     .header('Content-Type', 'application/json')
     .post(JSON.stringify({'nodes': vertices,
                           'edges': edges}), serverResponse);
