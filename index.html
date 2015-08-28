@@ -584,7 +584,7 @@ function start() {
       .attr("r", 12)
       .attr("stroke-width", 2)
       .style("fill", function(d) { return colorgradient(d.acceptor, d.donor);})
-      .style("stroke", function(d) { return "black";})
+      .style("stroke", "black")
       .call(force.drag);
 
   node.exit().remove();
