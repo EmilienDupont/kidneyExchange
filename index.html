@@ -505,7 +505,16 @@ function removeNode(donor, acceptor) {
 }
 
 function addLink(source, target, value) {
-  links.push({"source":source,"target":target,"value":value});
+  // Better to initialize source and target to objects explicitly
+  // If we add links with source and target as integer indexs
+  // before to call to force.start(), these are replaced by objects
+  // automatically by d3. But if we add links when the simulation
+  // is already running, source and target need to be objects
+
+  sourceNode = nodes[source];
+  targetNode = nodes[target];
+
+  links.push({"source":sourceNode,"target":targetNode,"value":value});
   start();
 }
 
@@ -517,11 +526,10 @@ function removeAllLinks() {
 function start() {
 
   var link = linksG.selectAll(".link")
-                .data(links, function(d) { return d.source.id + "-" + d.target.id; });
+                .data(links);
 
   link.enter().append("path")
       .attr("d", function(d) {
-            console.log('d', d);
             var dx = d.target.x - d.source.x,
                 dy = d.target.y - d.source.y,
                 dr = Math.sqrt(dx * dx + dy * dy);
@@ -535,7 +543,7 @@ function start() {
       .attr("class", "link")
       .style("stroke-width", 5)
       .style("stroke", function(d) { var src = d.source;
-                                     var donortype = nodes[src].donor;
+                                     var donortype = src.donor;
                                      console.log('donortype', donortype);
                                      return colorfill(donortype);} )
       .style("fill", "none");
