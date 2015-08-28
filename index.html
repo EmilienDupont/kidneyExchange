@@ -44,6 +44,11 @@ table, th, td {
   stroke: black;
 }
 
+.link {
+  stroke-width: 5px;
+  fill: none;
+}
+
 </style>
 <body>
   <ul id="nav">
@@ -546,11 +551,9 @@ function start() {
                 d.target.y;
       })
       .attr("class", "link")
-      .style("stroke-width", 5)
       .style("stroke", function(d) { var src = d.source;
                                      var donortype = src.donor;
-                                     return colorfill(donortype);} )
-      .style("fill", "none");
+                                     return colorfill(donortype);} );
 
   link.exit().remove();
   /*
