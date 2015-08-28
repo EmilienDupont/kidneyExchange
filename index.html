@@ -577,11 +577,11 @@ var matrix = (function () {
 
 d3.selectAll(".tabinput")
     .attr("min", 0)
-    .attr("max", 99)
+    .attr("max", 9)
     .on("input", function () {
       console.log(this.id, this.value);
-      if (+this.value > 99) {
-        this.value = 99;
+      if (+this.value > 9) {
+        this.value = 9;
       }
       if (+this.value !== +this.value) {
         this.value = 0;
