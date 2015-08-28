@@ -544,7 +544,6 @@ function start() {
       .style("stroke-width", 5)
       .style("stroke", function(d) { var src = d.source;
                                      var donortype = src.donor;
-                                     console.log('donortype', donortype);
                                      return colorfill(donortype);} )
       .style("fill", "none");
 
@@ -624,7 +623,6 @@ function colorfill(colortype) {
 function colorgradient(colortype1, colortype2) {
   var i = colortype1[4];
   var j = colortype2[4];
-  console.log('color',"url(#grad" + i + j + ")");
   return "url(#grad" + i + j + ")"; // E.g. if "type0" return colors(0)
 }
 
