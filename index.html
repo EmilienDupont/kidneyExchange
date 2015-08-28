@@ -852,11 +852,6 @@ function compute() {
   console.log('vertices', vertices);
   console.log('edges', edges);
 
-  if (nonzeros === 0) {
-    alert("No compatible donor recipient pairs! Add more nodes.");
-    return;
-  }
-
   d3.json('/kidneyexchange.py')
     .header('Content-Type', 'application/json')
     .post(JSON.stringify({'nodes': vertices,
