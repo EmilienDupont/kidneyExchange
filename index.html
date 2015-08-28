@@ -12,6 +12,9 @@
 </script>
 <link rel="stylesheet" href="http://examples.gurobi.com/base.css">
 <style>
+a:hover.screenshot {
+  opacity: .7;
+}
 
 .tabinput {
  width: 40px;
@@ -71,7 +74,7 @@ table, th, td {
         <img src="screenshot.png" alt="Live Demo" style="width: 100%; vertical-align: middle;">
       </a>
     </p>
-    
+
     <div class="example_section" id="problem">
       <h2><a href="#problem" name="problem">Problem Description</a></h2>
       <p>
@@ -102,7 +105,7 @@ table, th, td {
         pairs. We could, for example, transplant kidney 1 on patient 2, kidney
         2 on patient 3 and kidney 3 on patient 1. Longer cycles with even more
         patients could be possible, although this is usually not the case in
-        practice, for various reasons. If for example an exchange fails, more
+        practice, for various reasons. For example, if an exchange fails, more
         people would be affected for longer cycles. In addition, all transplants
         must be done simultaneously (otherwise donors could back out after their
         partner has received a kidney), so longer cycles would require more
@@ -168,11 +171,11 @@ table, th, td {
       </p>
 
       <p>
-        Now since an recipient only needs to receive one kidney and a donor can
-        at most give one kidney, each vertex of the vertex the graph can be in
-        at most one cycle. We therefore find all the cycles in which a given
-        vertex $v$ is included. To impose the constraint, the sum of the binary
-        variables corresponding to these cycles can at most be one. So we have
+        Now since a recipient only needs to receive one kidney and a donor can
+        at most give one kidney, each vertex of the graph can be in at most one
+        cycle. To impose this constraint, we first find all the cycles in which
+        a given vertex $v$ is included. The sum of the binary variables
+        corresponding to these cycles must then at most be one. So we have
         the set of constraints (one for each vertex $v$)
         \[
         \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
@@ -188,6 +191,7 @@ table, th, td {
                           & c \in \{ 0, 1 \} \quad \forall c \in C
         \end{array}
         \]
+        in the variables $c$.
       </p>
 
     </div>
@@ -296,34 +300,34 @@ m.optimize()
         <tr><td>
             <svg width="40" height="25" style="background-color:#1f77b4;"></svg>
             </td>
-            <td>1</td>
-            <td>0.5</td>
-            <td>0.2</td>
-            <td>0</td>
+            <td>100%</td>
+            <td>50%</td>
+            <td>20%</td>
+            <td>0%</td>
         </tr>
         <tr><td>
             <svg width="40" height="25" style="background-color:#ff7f0e;"></svg>
             </td>
-            <td>0.5</td>
-            <td>1</td>
-            <td>0</td>
-            <td>0.7</td>
+            <td>50%</td>
+            <td>100%</td>
+            <td>0%</td>
+            <td>70%</td>
         </tr>
         <tr><td>
             <svg width="40" height="25" style="background-color:#2ca02c;"></svg>
             </td>
-            <td>0.2</td>
-            <td>0</td>
-            <td>1</td>
-            <td>0.6</td>
+            <td>20%</td>
+            <td>0%</td>
+            <td>100%</td>
+            <td>60%</td>
         </tr>
         <tr><td>
             <svg width="40" height="25" style="background-color:#d62728;"></svg>
             </td>
-            <td>0</td>
-            <td>0.7</td>
-            <td>0.6</td>
-            <td>1</td>
+            <td>0%</td>
+            <td>70%</td>
+            <td>60%</td>
+            <td>100%</td>
         </tr>
         </tbody>
         </table>
