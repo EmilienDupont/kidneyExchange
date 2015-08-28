@@ -372,6 +372,79 @@ m.optimize()
         You can also drag the nodes around to make the visualization clearer.
       </p>
 
+      <table style="width: 800px">
+        <thead>
+          <tr>
+            <td></td>
+            <td>
+              <svg width="40" height="25" style="background-color:#1f77b4;">
+                <text x="10" y="20" style="fill: white">R</text>
+              </svg>
+            </td>
+            <td>
+              <svg width="40" height="25" style="background-color:#ff7f0e;">
+                <text x="10" y="20" style="fill: white">R</text>
+              </svg>
+            </td>
+        <td>
+          <svg width="40" height="25" style="background-color:#2ca02c;">
+            <text x="10" y="20" style="fill: white">R</text>
+          </svg>
+        </td>
+        <td>
+          <svg width="40" height="25" style="background-color:#d62728;">
+            <text x="10" y="20" style="fill: white">R</text>
+          </svg>
+        </td>
+        </tr>
+          <tbody>
+            <tr>
+              <td>
+                <svg width="40" height="25" style="background-color:#1f77b4;">
+                  <text x="10" y="20" style="fill: white">D</text>
+                </svg>
+              </td>
+              <td></td>
+              <td><input type="number" value="0" id="i12" class="tabinput"></td>
+              <td><input type="number" value="1" id="i13" class="tabinput"></td>
+              <td><input type="number" value="1" id="i14" class="tabinput"></td>
+            </tr>
+            <tr>
+              <td>
+                <svg width="40" height="25" style="background-color:#ff7f0e;">
+                  <text x="10" y="20" style="fill: white">D</text>
+                </svg>
+              </td>
+              <td><input type="number" value="2" id="i21" class="tabinput"></td>
+              <td></td>
+              <td><input type="number" value="1" id="i23" class="tabinput"></td>
+              <td><input type="number" value="1" id="i24" class="tabinput"></td>
+            </tr>
+            <tr>
+              <td>
+                <svg width="40" height="25" style="background-color:#2ca02c;">
+                  <text x="10" y="20" style="fill: white">D</text>
+                </svg>
+              </td>
+              <td><input type="number" value="1" id="i31" class="tabinput"></td>
+              <td><input type="number" value="1" id="i32" class="tabinput"></td>
+              <td></td>
+              <td><input type="number" value="2" id="i34" class="tabinput"></td>
+        </tr>
+        <tr>
+          <td>
+            <svg width="40" height="25" style="background-color:#d62728;">
+              <text x="10" y="20" style="fill: white">D</text>
+            </svg>
+          </td>
+          <td><input type="number" value="1" id="i41" class="tabinput"></td>
+          <td><input type="number" value="1" id="i42" class="tabinput"></td>
+          <td><input type="number" value="0" id="i43" class="tabinput"></td>
+          <td></td>
+        </tr>
+          </tbody>
+      </table>
+
       <div id="demoarea">
       </div>
       <button class="pure-button" onclick="compute()">Compute</button>
@@ -428,7 +501,7 @@ var svg = d3.select("#demoarea")
 
 var colorGradients = [];
 
-// Each row is a recipient, each column is a donor
+// Each row is a donor, each column is a recipient
 for (var i = 0; i < 4; i++) {
   var row = [];
   for (var j = 0; j < 4; j++) {
@@ -457,16 +530,6 @@ var backgroundG = svg.append("g");
 var linksG = svg.append("g");
 var nodesG = svg.append("g");
 
-// G objects for buttons
-var buttonsG = svg.append("g");
-var buttonSymG = svg.append("g");
-var buttonSym2G = svg.append("g");
-var countG = svg.append("g");
-
-// G objects for clickable parts
-var clickableG = svg.append("g");
-var clickable2G = svg.append("g");
-
 // G object for spinner
 var spinnerG = svg.append("g");
 
@@ -485,13 +548,71 @@ var force = d3.layout.force()
 var nodes = force.nodes();
 var links = force.links();
 
+
+var matrix = (function () {
+   /* row = matrix[i] */
+   /* row[j] = element i j */
+   var mat = [];
+   for (var i = 0; i < 4; i++) {
+      var row = [];
+      for (var j = 0; j < 4; j++) {
+        if (i !== j) {
+           var myid = "#i" + (i+1) + (j+1);
+           var sel = d3.select(myid);
+           console.log(myid, sel);
+           console.log(myid, sel.attr("value"));
+           var elem = +sel.attr("value");
+           row.push(elem);
+           for (var k = 0; k < elem; k++) {
+               addNode(i, j);
+           }
+        } else {
+           row.push(0);
+        }
+      }
+      mat.push(row);
+   }
+  return mat;
+}());
+
+d3.selectAll(".tabinput")
+    .attr("min", 0)
+    .attr("max", 99)
+    .on("input", function () {
+      console.log(this.id, this.value);
+      if (+this.value > 99) {
+        this.value = 99;
+      }
+      if (+this.value !== +this.value) {
+        this.value = 0;
+      }
+      var idtxt = this.id;
+      var i = +idtxt[1]-1;
+      var j = +idtxt[2]-1;
+      var oldval = matrix[i][j];
+      matrix[i][j] = +this.value;
+      var delta;
+      if (oldval < matrix[i][j]) {
+         for (delta = oldval; delta < matrix[i][j]; delta++) {
+             addNode(i, j);
+         }
+      } else  if (oldval > matrix[i][j]) {
+         for (delta = oldval; delta > matrix[i][j]; delta--) {
+            removeNode(i, j);
+         }
+      }
+    })
+
+
+
 // Functions needed for force layout interaction
-function addNode(id, donor, acceptor) {
+function addNode(donor, acceptor) {
   console.log('nodeNumber',nodeNumber);
-  nodeNumber += 1;
-  buttonCount[parseInt(donor[4]) + 4*parseInt(acceptor[4])] += 1;
-  nodes.push({"id":id,"donor":donor,"acceptor":acceptor});
-  start();
+  nodeNumber++;
+  nodes.push({"id": nodeNumber,
+              "donor": donor,
+              "acceptor": acceptor });
+  removeAllLinks();
 }
 
 function removeNode(donor, acceptor) {
@@ -508,10 +629,10 @@ function removeNode(donor, acceptor) {
     console.log('no node');
     return;
   } else {
-    buttonCount[parseInt(donor[4]) + 4*parseInt(acceptor[4])] -= 1;
     nodes.splice(idx, 1);
     start();
   }
+  removeAllLinks();
 }
 
 function addLink(source, target, value) {
@@ -553,7 +674,7 @@ function start() {
       .attr("class", "link")
       .style("stroke", function(d) { var src = d.source;
                                      var donortype = src.donor;
-                                     return colorfill(donortype);} );
+                                     return colors(donortype);} );
 
   link.exit().remove();
 
@@ -577,14 +698,14 @@ function start() {
         .attr("y", 7)
         .text("D")
         .style("fill", "black");
-   //     .style("fill", function(d) { return colorfill(d.donor); });
+   //     .style("fill", function(d) { return colors(d.donor); });
 
   groupEnter.append("text")
         .attr("x", 2)
         .attr("y", 7)
         .text("R")
         .style("fill", "black");
- //       .style("fill", function(d) { return colorfill(d.acceptor); });
+ //       .style("fill", function(d) { return colors(d.acceptor); });
 
   groups.exit().remove();
 
@@ -612,13 +733,8 @@ function start() {
   force.start();
 }
 
-function colorfill(colortype) {
-  return colors(parseInt(colortype[4])); // E.g. if "type0" return colors(0)
-}
 
-function colorgradient(colortype1, colortype2) {
-  var i = colortype1[4];
-  var j = colortype2[4];
+function colorgradient(i, j) {
   return "url(#grad" + i + j + ")"; // E.g. if "type0" return colors(0)
 }
 
@@ -637,139 +753,9 @@ backgroundG.append("rect")
            .attr("fill", "white")
            .attr("stroke", "black");
 
-var types = ["type0", "type1", "type2", "type3"];
-var buttonW = width/15; //20
-var buttonH = height/20; //25
-var clickW = buttonW/3;
-var clickH = buttonH/2;
-var buttonData = [];
-var buttonCount = [];
-
-for (var i = 0; i < types.length; i++) {
-  for (var j = 0; j < types.length; j++) {
-    buttonData.push([types[i], types[j]]);
-    buttonCount.push(0);
-  }
-}
-
-buttonsG.selectAll("rect")
-        .data(buttonData)
-        .enter()
-        .append("rect")
-        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW; })
-        .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
-        .attr("height", buttonH)
-        .attr("width", buttonW)
-        .attr("stroke", "black")
-        .attr("fill", "none");
-
-for (var i = 0; i < types.length; i++) {
-  buttonsG.append("rect").attr("x", (i+1)*buttonW).attr("y",0).attr("fill", colorfill(types[i]))
-          .attr("height", buttonH).attr("width", buttonW);
-  buttonsG.append("text").attr("x", (i+1.5)*buttonW).attr("y",.7*buttonH).attr("fill", colorfill(types[i]))
-          .text("D");
-  buttonsG.append("rect").attr("y", (i+1)*buttonH).attr("x",0).attr("fill", colorfill(types[i]))
-          .attr("height", buttonH).attr("width", buttonW);
-  buttonsG.append("text").attr("y", (i+1.7)*buttonH).attr("x",.5*buttonW).attr("fill", colorfill(types[i]))
-          .text("R");
-}
-
-buttonsG.selectAll("text").attr("fill", "white")
-                          .attr("font-size", 18)
-                          .attr("font-weight", 200)
-                          .attr("text-anchor", "middle")
-                          .attr("font-family", "Helvetica Neue")
-                          .attr("class", "noselect");;
-
-clickableG.selectAll("rect")
-          .data(buttonData)
-          .enter()
-          .append("rect")
-          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - clickW); })
-          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH;})
-          .attr("height", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
-                                        { return 0; } else { return clickH; } })
-          .attr("width", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
-                                        { return 0; } else { return clickW; } })
-          .attr("opacity", 0)
-          .attr("id", function(d) { return d; })
-          .attr("fill", "green")
-          .attr("class", "add")
-          .on("mousedown", addPoint);
-
-clickable2G.selectAll("rect")
-          .data(buttonData)
-          .enter()
-          .append("rect")
-          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - clickW); })
-          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + clickH;})
-          .attr("height", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
-                                        { return 0; } else { return clickH; } })
-          .attr("width", function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15)
-                                        { return 0; } else { return clickW; } })
-          .attr("opacity", 0)
-          .attr("id", function(d) { return d; })
-          .attr("fill", "red")
-          .attr("class", "add")
-          .on("mousedown", removePoint);
-
-buttonSymG.selectAll("text")
-          .data(buttonData)
-          .enter()
-          .append("text")
-          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - .5*clickW); })
-          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + .9*clickH;})
-          .attr("fill", "green")
-          .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return "+";} })
-          .attr("text-anchor", "middle")
-          .attr("class", "noselect")
-          .attr("font-size", 20)
-          .attr("font-weight", 800);
-
-buttonSym2G.selectAll("text")
-          .data(buttonData)
-          .enter()
-          .append("text")
-          .attr("x", function(d,i) { return (i % types.length)*(buttonW) + buttonW + (buttonW - .5*clickW); })
-          .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + buttonH + 1.85*clickH;})
-          .attr("fill", "red")
-          .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return "-";} })
-          .attr("text-anchor", "middle")
-          .attr("class", "noselect")
-          .attr("font-size", 20)
-          .attr("font-weight", 800);;
-
-function recount() {
-  countG.selectAll("text").remove("text");
-  countG.selectAll("text")
-        .data(buttonCount)
-        .enter()
-        .append("text")
-        .attr("x", function(d,i) { return (i % types.length)*(buttonW) + 1.5*buttonW - clickW/2; })
-        .attr("y", function(d,i) { return Math.floor(i/types.length)*buttonH + 1.7*buttonH;})
-        .attr("text-anchor", "middle")
-        .attr("class", "noselect")
-        .text(function(d,i) { if(i === 0 || i === 5 || i === 10 || i === 15) {return "";} else {return d;} });
-}
-
-function addPoint() {
-  removeAllLinks();
-  var id = d3.select(this).attr("id");
-  addNode(nodeNumber, id.slice(6,11), id.slice(0,5));
-  recount();
-}
-
-function removePoint() {
-  removeAllLinks();
-  var id = d3.select(this).attr("id");
-  removeNode(id.slice(6,11), id.slice(0,5));
-  recount();
-}
-
-
 /*******************************
  *
- *        INITIAL DATA
+ *        COMPATIBILITY DATA
  *
  *******************************/
 
@@ -782,21 +768,6 @@ var compatibility = [[1, type12, type13, type14],
                      [type13, type23, 1, type34],
                      [type14, type24, type34, 1]];
 
-// Initial nodes
-addNode(0,"type2","type0");
-addNode(1,"type1","type3");
-addNode(2,"type2","type1");
-addNode(3,"type0","type3");
-addNode(4,"type3","type1");
-addNode(5,"type1","type0");
-addNode(6,"type2","type3");
-addNode(7,"type1","type0");
-addNode(8,"type3","type0");
-addNode(9,"type2","type3");
-addNode(10,"type0","type2");
-addNode(11,"type1","type2");
-
-recount();
 
 /*******************************
  *
@@ -839,8 +810,8 @@ function compute() {
     vertices.push(i);
     for (var j = 0; j < numNodes; j++) { // Iterate over acceptors
       if (i !== j) {
-        var node1 = nodes[i].donor.charAt(4);
-        var node2 = nodes[j].acceptor.charAt(4);
+        var node1 = nodes[i].donor;
+        var node2 = nodes[j].acceptor;
         node1 = parseInt(node1);
         node2 = parseInt(node2);
         var edgeweight = compatibility[node1][node2];
