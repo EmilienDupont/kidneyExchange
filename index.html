@@ -276,8 +276,8 @@ table, th, td {
         So finally our optimization model becomes
         \[
         \begin{array}{ll}
-        \text{maximize} & \sum_{c \in C} w_c c \\
-        \text{subject to} & \sum_{c : v \in c} c \leq 1 \quad \forall v \in V \\
+        \text{maximize}   & {\displaystyle \sum_{c \in C} w_c c} \\
+        \text{subject to} & {\displaystyle \sum_{c : v \in c} c} \leq 1 \quad \forall v \in V \\
                           & c \in \{ 0, 1 \} \quad \forall c \in C
         \end{array}
         \]
