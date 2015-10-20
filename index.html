@@ -243,32 +243,32 @@ table, th, td {
         Let $C$ be the set of cycles in the graph of length at most 3. Let $w_c$
         denote the weight of the cycle, which is the sum of the edge weights in
         the cycle. Our goal is to find a cycle cover of the graph with maximum
-        weight. Therefore we define a binary variable $x_c$ for each cycle such
+        weight. Therefore, we define a binary variable $x_c$ for each cycle such
         that
         \[
         x_c = \left\{\begin{array}{ll}
                1 & \text{if cycle $c$ is in the cover}\\
-               0 & \mathrm{otherwise}
+               0 & \mathrm{otherwise.}
               \end{array}\right.
         \]
       </p>
 
       <p>
-        The objective we seek to maximize is the total weight of the cover, i.e.
+        The objective we seek to maximize is the total weight of the cover:
         \[
-        \text{cycle cover weight} = \sum_{c \in C} w_c x_c
+        \text{total cover weight} = \sum_{c \in C} w_c x_c.
         \]
       </p>
 
       <p>
         Now since a recipient only needs to receive one kidney and a donor can
-        at most give one kidney, each vertex of the graph can be in at most one
+        give at most one kidney, each vertex of the graph can be in at most one
         cycle. To impose this constraint, we first find all the cycles in which
         a given vertex $v$ is included. The sum of the binary variables
         corresponding to these cycles must then at most be one. So we have
-        the set of constraints (one for each vertex $v$)
+        the set of constraints (one for each vertex $v$):
         \[
-        \sum_{c : v \in c} x_c \leq 1 \quad \forall v \in V
+        \sum_{c : v \in c} x_c \leq 1 \quad \forall v \in V.
         \]
       </p>
 
