@@ -243,11 +243,11 @@ table, th, td {
         Let $C$ be the set of cycles in the graph of length at most 3. Let $w_c$
         denote the weight of the cycle, which is the sum of the edge weights in
         the cycle. Our goal is to find a cycle cover of the graph with maximum
-        weight. Therefore we define a binary variable $c$ for each cycle such
+        weight. Therefore we define a binary variable $x_c$ for each cycle such
         that
         \[
-        c = \left\{\begin{array}{ll}
-               1 & \text{if cycle is in the cover}\\
+        x_c = \left\{\begin{array}{ll}
+               1 & \text{if cycle $c$ is in the cover}\\
                0 & \mathrm{otherwise}
               \end{array}\right.
         \]
@@ -256,7 +256,7 @@ table, th, td {
       <p>
         The objective we seek to maximize is the total weight of the cover, i.e.
         \[
-        \text{cycle cover weight} = \sum_{c \in C} w_c c
+        \text{cycle cover weight} = \sum_{c \in C} w_c x_c
         \]
       </p>
 
@@ -268,7 +268,7 @@ table, th, td {
         corresponding to these cycles must then at most be one. So we have
         the set of constraints (one for each vertex $v$)
         \[
-        \sum_{c : v \in c} c \leq 1 \quad \forall v \in V
+        \sum_{c : v \in c} x_c \leq 1 \quad \forall v \in V
         \]
       </p>
 
@@ -276,12 +276,12 @@ table, th, td {
         So finally our optimization model becomes
         \[
         \begin{array}{ll}
-        \text{maximize}   & {\displaystyle \sum_{c \in C} w_c c} \\
-        \text{subject to} & {\displaystyle \sum_{c : v \in c} c} \leq 1 \quad \forall v \in V \\
-                          & c \in \{ 0, 1 \} \quad \forall c \in C
+        \text{maximize}   & {\displaystyle \sum_{c \in C} w_c x_c} \\
+        \text{subject to} & {\displaystyle \sum_{c : v \in c} x_c} \leq 1 \quad \forall v \in V \\
+                          & x_c \in \{ 0, 1 \} \quad \forall c \in C
         \end{array}
         \]
-        in the variables $c$.
+        in the variables $x_c$.
       </p>
 
     </div>
