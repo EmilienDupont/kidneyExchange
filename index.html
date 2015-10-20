@@ -103,8 +103,88 @@ table, th, td {
         receives kidney 1.
       </p>
 
+      <p>In this example we consider four types of patients. Each
+        patient type is represented by a color. There are different
+        compatibility factors between different types as shown in the
+        table:
+
+        <table style="width: 800px">
+        <thead>
+        <tr>
+        <td></td>
+        <td>
+        <svg width="40" height="25" style="background-color:#1f77b4;">
+                <text x="10" y="20" style="fill: white">R</text>
+        </svg>
+        </td>
+        <td>
+        <svg width="40" height="25" style="background-color:#ff7f0e;">
+          <text x="10" y="20" style="fill: white">R</text>
+        </svg>
+        </td>
+        <td>
+        <svg width="40" height="25" style="background-color:#2ca02c;">
+          <text x="10" y="20" style="fill: white">R</text>
+        </svg>
+        </td>
+        <td>
+        <svg width="40" height="25" style="background-color:#d62728;">
+          <text x="10" y="20" style="fill: white">R</text>
+        </svg>
+        </td>
+        </tr>
+        <tbody>
+        <tr><td>
+            <svg width="40" height="25" style="background-color:#1f77b4;">
+              <text x="10" y="20" style="fill: white">D</text>
+            </svg>
+            </td>
+            <td>100%</td>
+            <td>50%</td>
+            <td>20%</td>
+            <td>0%</td>
+        </tr>
+        <tr><td>
+            <svg width="40" height="25" style="background-color:#ff7f0e;">
+              <text x="10" y="20" style="fill: white">D</text>
+            </svg>
+            </td>
+            <td>50%</td>
+            <td>100%</td>
+            <td>0%</td>
+            <td>70%</td>
+        </tr>
+        <tr><td>
+            <svg width="40" height="25" style="background-color:#2ca02c;">
+              <text x="10" y="20" style="fill: white">D</text>
+            </svg>
+            </td>
+            <td>20%</td>
+            <td>0%</td>
+            <td>100%</td>
+            <td>60%</td>
+        </tr>
+        <tr><td>
+            <svg width="40" height="25" style="background-color:#d62728;">
+              <text x="10" y="20" style="fill: white">D</text>
+            </svg>
+            </td>
+            <td>0%</td>
+            <td>70%</td>
+            <td>60%</td>
+            <td>100%</td>
+        </tr>
+        </tbody>
+        </table>
+      </p>
       <p>
-        Now imagine this problem on a national scale. There are currently
+        For example, a red donor and a orange recipient are 70% compatible. But
+        a blue donor and a green recipient are only 20% compatible.
+      </p>
+
+
+      <p>
+        Imagine the kidney exchange problem on a national scale. There are currently
         <a href="http://www.unos.org/">70,000 patients</a> waiting on kidneys
         in the US. Using kidney exchange, the number of deaths related to
         kidney disease could be significantly reduced.
@@ -285,79 +365,6 @@ m.optimize()
         Below is a visualization of our Kidney Exchange example.
       </p>
 
-      <p>
-        Each patient type is represented by a color. There are different
-        compatibility factors between different types as shown in the table:
-
-        <table style="width: 800px">
-        <thead>
-        <tr>
-        <td></td>
-        <td>
-        <svg width="40" height="25" style="background-color:#1f77b4;">
-                <text x="10" y="20" style="fill: white">R</text>
-        </svg>
-        </td>
-        <td>
-        <svg width="40" height="25" style="background-color:#ff7f0e;">
-          <text x="10" y="20" style="fill: white">R</text>
-        </svg>
-        </td>
-        <td>
-        <svg width="40" height="25" style="background-color:#2ca02c;">
-          <text x="10" y="20" style="fill: white">R</text>
-        </svg>
-        </td>
-        <td>
-        <svg width="40" height="25" style="background-color:#d62728;">
-          <text x="10" y="20" style="fill: white">R</text>
-        </svg>
-        </td>
-        </tr>
-        <tbody>
-        <tr><td>
-            <svg width="40" height="25" style="background-color:#1f77b4;">
-              <text x="10" y="20" style="fill: white">D</text>
-            </svg>
-            </td>
-            <td>100%</td>
-            <td>50%</td>
-            <td>20%</td>
-            <td>0%</td>
-        </tr>
-        <tr><td>
-            <svg width="40" height="25" style="background-color:#ff7f0e;">
-              <text x="10" y="20" style="fill: white">D</text>
-            </svg>
-            </td>
-            <td>50%</td>
-            <td>100%</td>
-            <td>0%</td>
-            <td>70%</td>
-        </tr>
-        <tr><td>
-            <svg width="40" height="25" style="background-color:#2ca02c;">
-              <text x="10" y="20" style="fill: white">D</text>
-            </svg>
-            </td>
-            <td>20%</td>
-            <td>0%</td>
-            <td>100%</td>
-            <td>60%</td>
-        </tr>
-        <tr><td>
-            <svg width="40" height="25" style="background-color:#d62728;">
-              <text x="10" y="20" style="fill: white">D</text>
-            </svg>
-            </td>
-            <td>0%</td>
-            <td>70%</td>
-            <td>60%</td>
-            <td>100%</td>
-        </tr>
-        </tbody>
-        </table>
-      </p>
       <p>
         You can add different types of donor/recipient pairs by changing
         the numbers in the table below.
