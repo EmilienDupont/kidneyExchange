@@ -385,22 +385,15 @@ table, th, td {
 
       </script>
 
-
-      <!-- <p> -->
-      <!--   Now, suppose there are two patient-donor pairs. Donor 1 and patient -->
-      <!--   1 have incompatible kidneys, but donor 2's kidney is compatible with -->
-      <!--   patient 1 and donor 1's kidney is compatible with patient 2's. A -->
-      <!--   <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">kidney exchange</a> -->
-      <!--   can then take place: patient 1 receives kidney 2, and patient 2 -->
-      <!--   receives kidney 1. -->
-      <!-- </p> -->
-
        <!-- Imagine the kidney exchange problem on a national scale. There are currently -->
        <!--  <a href="http://www.unos.org/">70,000 patients</a> waiting on kidneys -->
        <!--  in the US. -->
 
-      <p>According to the <a href="http://www.nytimes.com/2015/05/03/magazine/the-great-american-kidney-swap.html">New York Times</a>, last year in the United States more than 500 kidneys were
-        transplanted through these paired exchange programs.
+      <p>According to
+        the <a href="http://www.nytimes.com/2015/05/03/magazine/the-great-american-kidney-swap.html">New
+        York Times</a>, last year in the United States more than 500
+        kidneys were transplanted through these paired exchange
+        programs.
       </p>
 
       <p>
@@ -434,32 +427,36 @@ table, th, td {
 
       <p>
         Kidney exchange is an example of the more general
-        <a href="https://en.wikipedia.org/wiki/Barter">Barter Exchange</a> Market
-        problem. In this problem, agents seek to swap their items, creating cycles
-        of agents where each agent receives the item from the previous agent in
-        the cycle. The goal is then to find the cycles which maximize the
-        utilities of each agent. In contrast to usual exchanges, items are swapped
-        directly without the use of money.
+        <i>barter exchange market problem</i>. In this problem, agents
+        seek to swap their items, creating cycles of agents where each
+        agent receives the item from the previous agent in the
+        cycle. The goal is to find a set of cycles which maximize the
+        utility over all agents. In contrast to usual exchanges, in a
+        barter exchange, items are swapped directly without the use of
+        money.
       </p>
 
       <p>
-        There are <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">
-        several ways</a> to formulate this problem as an integer program. We will
-        use a <em>cycle cover</em> formulation.
+        There
+        are <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">
+        several ways</a> to formulate the kidney exchange problem as
+        an integer program. In this example, we will use a <em>cycle
+        cover</em> formulation.
       </p>
 
-      <p>
-        Let $G$ be a graph where the set of vertices $V$ corresponds to
-        donor/recipient pairs and the set of directed weighted edges $E$ represent
-        compatibility factors between donors and recipients. If, for example,
-        patient 1 and kidney 2 are perfectly compatible (same blood type etc...)
-        we give the edge (1,2) weight 1. If they are less compatible and the risk
-        of failure of a transplant is higher, then we give the edge a lower weight.
+      <p> Let $G(V, E)$ be a directed graph with weighted edges. Each
+        vertex in $V$ corresponds to a donor/recipient pair. The
+        directed weighted edges represent the compatiblity factors
+        between donors and recipients.  For example, if recipient 1
+        and donor 2 are perfectly compatible, we give the edge (1,2) a
+        weight of 1. If they are less compatible, and the risk of
+        failure of a transplant is higher, we would give the edge a
+        smaller weight.
       </p>
 
       <p>
         Let $C$ be the set of cycles in the graph of length at most 3. Let $w_c$
-        denote the weight of the cycle, which is the sum of the edge weights in
+        denote the weight of cycle $c$, which is equal to the sum of all edge weights in
         the cycle. Our goal is to find a cycle cover of the graph with maximum
         weight. Therefore, we define a binary variable $x_c$ for each cycle such
         that
@@ -479,12 +476,12 @@ table, th, td {
       </p>
 
       <p>
-        Now since a recipient only needs to receive one kidney and a donor can
+        Now since a recipient needs to receive one kidney and a donor can
         give at most one kidney, each vertex of the graph can be in at most one
         cycle. To impose this constraint, we first find all the cycles in which
         a given vertex $v$ is included. The sum of the binary variables
         corresponding to these cycles must then at most be one. So we have
-        the set of constraints (one for each vertex $v$):
+        the following set of constraints (one for each vertex $v$):
         \[
         \sum_{c : v \in c} x_c \leq 1 \quad \forall v \in V.
         \]
@@ -495,11 +492,10 @@ table, th, td {
         \[
         \begin{array}{ll}
         \text{maximize}   & {\displaystyle \sum_{c \in C} w_c x_c} \\
-        \text{subject to} & {\displaystyle \sum_{c : v \in c} x_c} \leq 1 \quad \forall v \in V \\
-                          & x_c \in \{ 0, 1 \} \quad \forall c \in C
+        \text{subject to} & {\displaystyle \sum_{c : v \in c} x_c} \leq 1, \quad \forall v \in V, \\
+                          & x_c \in \{ 0, 1 \}, \quad \forall c \in C.
         \end{array}
         \]
-        in the variables $x_c$.
       </p>
 
     </div>
@@ -520,13 +516,13 @@ edges = { (0,1) : 1, (1,0) : 1, (0,2) : 1, (2,0) : 1,
 def twoCycle(vertices, edges):
     '''
     Returns a dictionary of 2 cycles. Keys: (u,v), Value: weight of cycle
-    Note that u < v to not double count cycles.
+    Note that u &lt; v to not double count cycles.
     '''
     twoCycles = {}
     for edge in edges:
         u = edge[0]
         v = edge[1]
-        if (u < v and (v,u) in edges):
+        if (u &lt; v and (v,u) in edges):
             twoCycles[(u,v)] = edges[(u,v)] + edges[(v,u)]
     return twoCycles
 
@@ -547,8 +543,8 @@ def threeCycle(vertices, edges):
                 threeCycles[(u,w,v)] = edges[(u,v)] + edges[(u,w)] + edges[(w,v)]
     return threeCycles
 
-twoCycles = twoCycle(vertices,edges)
-threeCycles = threeCycle(vertices,edges)
+twoCycles = twoCycle(vertices, edges)
+threeCycles = threeCycle(vertices, edges)
 
 m = Model()
 
@@ -589,7 +585,7 @@ m.optimize()
       </p>
 
       <p>
-        Patient/donor pairs are represented by nodes
+        Donor/recipient pairs are represented by nodes
         <svg height="20" width="20">
           <defs>
             <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -600,8 +596,8 @@ m.optimize()
           <circle cx="10" cy="10" r="8" stroke="black" stroke-width="2" fill="url(#grad1)" />
         </svg>
 
-         where the <em>left</em> side of the circle represents the type of the <em>donor</em>
-         and the <em>right</em> side represents the type of the <em>recipient</em>.
+         where the color of the <em>left</em> side of the circle represents the type of the <em>donor</em>
+         and the color of the <em>right</em> side represents the type of the <em>recipient</em>.
       </p>
 
       <p>
