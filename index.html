@@ -88,17 +88,36 @@ table, th, td {
 
     <div class="example_section" id="problem">
       <h2><a href="#problem" name="problem">Problem Description</a></h2>
-      <p>
-        Imagine a person in need of a kidney transplant who has a willing
-        donor (e.g. a family member). The donor's kidney is, however,
-        incompatible with the patient (because of differing blood types for
-        example) and so the transplant cannot be made.
+
+      <p>According to
+        the <a href="http://www.nytimes.com/2015/05/03/magazine/the-great-american-kidney-swap.html">
+        New York Times</a>, in the United States alone there are more
+        than 100,000 people with renal disease waiting to receive a
+        kidney. Patients typically wait four to five years before a
+        transplant. And last year, in 2014, more than 4,000 people
+        died while waiting on the transplant list.
       </p>
 
-      <p>In this example we consider four types of patients
-        categorized by blood type and antibodies. Each patient type is
-        represented by a color. The different compatibility
-        factors between the different types are shown in the table below:
+      <p>New software and algorithms, many of them based on integer
+        programming, have recently been developed to better match
+        patients with donors. These matchings are based on swapping
+        kidneys.
+      </p>
+
+      <p>
+         Often a patient in need of a transplant has a friend or
+        family member who is willing to donate their kidney. However,
+        because of differences in blood types and certain proteins in
+        the blood, the potential donor may be incompatiable with the
+        patient. Thus a transplant cannot be made, or the recipient
+        may have a high chance of rejecting the donor's kidney.
+      </p>
+
+      <p>In this example we consider four types of patients (donors
+        and recipients) categorized by blood type and proteins. Each
+        patient type is represented by a color: blue, orange, green,
+        or red. The different compatibility factors between the
+        different types are shown in the table below:
 
         <table style="width: 800px">
         <thead>
@@ -170,45 +189,243 @@ table, th, td {
         </table>
       </p>
       <p>
-        For example, a red donor and a orange recipient are 70% compatible. But
-        a blue donor and a green recipient are only 20% compatible.
+        For example, an orange donor cannot give a kidney to a green recipient,
+        and a blue donor and a green recipient are only 20% compatiable.
+      </p>
+
+      <p>The key to conducting a transplant in the presence of these
+        incompatibilites, is doing
+        a <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">pair-exchange</a>,
+        also known as a kidney swap.
       </p>
 
       <p>
-        Now, suppose there are two patient-donor pairs. Donor 1 and patient
-        1 have incompatible kidneys, but donor 2's kidney is compatible with
-        patient 1 and donor 1's kidney is compatible with patient 2's. A
-        <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">kidney exchange</a>
-        can then take place: patient 1 receives kidney 2, and patient 2
-        receives kidney 1.
+        Suppose there are four patients: two potential recipients and two potential donors.
+        Recipient 1 is orange and her potential donor is green, while recipient
+        2 is green and his potential donor is blue. From the table above,
+        we see that recipient 1 and donor 1 are incompatibale, and recipient
+        2 and donor 2 are only 20% compatible. However, if recipient 1 were
+        to receive a kidney from donor 2, they would be 50% compatiable. And
+        if recipient 2 were to receive a kidney from donor 2 they would be 100%
+        compatiable.
+        </p>
+
+      <div id="diagram">
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+      <script>
+        var diagram = d3.select("#diagram")
+                       .append("svg")
+                        .attr("width", 400)
+                        .attr("height", 150);
+
+        diagram.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 10)
+                .attr("y", 0)
+                .attr("fill", "#ff7f0e");
+        diagram.append("text")
+               .attr("x", 20)
+               .attr("y", 20)
+               .attr("fill", "white")
+               .text("Recipient 1");
+
+        diagram.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 200)
+                .attr("y", 0)
+                .attr("fill", "#2ca02c");
+        diagram.append("text")
+               .attr("x", 210)
+               .attr("y", 20)
+               .attr("fill", "white")
+               .text("Recipient 2");
+
+        diagram.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 10)
+                .attr("y", 100)
+                .attr("fill", "#2ca02c");
+        diagram.append("text")
+               .attr("x", 20)
+               .attr("y", 120)
+               .attr("fill", "white")
+               .text("Donor 1");
+
+        diagram.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 200)
+                .attr("y", 100)
+                .attr("fill", "#1f77b4");
+        diagram.append("text")
+               .attr("x", 220)
+               .attr("y", 120)
+               .attr("fill", "white")
+               .text("Donor 2");
+
+        diagram.append("line")
+               .attr("x1", 60)
+               .attr("y1", 25)
+               .attr("x2", 60)
+               .attr("y2", 100)
+               .attr("stroke", "black");
+
+        diagram.append("line")
+               .attr("x1", 250)
+               .attr("y1", 25)
+               .attr("x2", 250)
+               .attr("y2", 100)
+               .attr("stroke", "black");
+
+        diagram.append("text")
+           .attr("x", 70)
+           .attr("y", 70)
+           .attr("fill", "black")
+           .text("0% match");
+
+
+        diagram.append("text")
+           .attr("x", 260)
+           .attr("y", 70)
+           .attr("fill", "black")
+           .text("20% match");
+
+        diagram.append("line")
+          .attr("x1", 360)
+          .attr("y1", 0)
+          .attr("x2", 360)
+          .attr("y2", 130)
+          .attr("stroke", "black")
+          .attr("stroke-dasharray", "10, 10");
+
+
+        var diagram2 = d3.select("#diagram")
+                       .append("svg")
+                        .attr("width", 400)
+                        .attr("height", 150);
+
+        diagram2.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 10)
+                .attr("y", 0)
+                .attr("fill", "#ff7f0e");
+        diagram2.append("text")
+               .attr("x", 20)
+               .attr("y", 20)
+               .attr("fill", "white")
+               .text("Recipient 1");
+
+        diagram2.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 200)
+                .attr("y", 0)
+                .attr("fill", "#2ca02c");
+        diagram2.append("text")
+               .attr("x", 210)
+               .attr("y", 20)
+               .attr("fill", "white")
+               .text("Recipient 2");
+
+        diagram2.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 10)
+                .attr("y", 100)
+                .attr("fill", "#2ca02c");
+        diagram2.append("text")
+               .attr("x", 20)
+               .attr("y", 120)
+               .attr("fill", "white")
+               .text("Donor 1");
+
+        diagram2.append("rect")
+                .attr("width", 100)
+                .attr("height", 25)
+                .attr("x", 200)
+                .attr("y", 100)
+                .attr("fill", "#1f77b4");
+        diagram2.append("text")
+               .attr("x", 220)
+               .attr("y", 120)
+               .attr("fill", "white")
+               .text("Donor 2");
+
+        diagram2.append("line")
+               .attr("x1", 60)
+               .attr("y1", 25)
+               .attr("x2", 250)
+               .attr("y2", 100)
+               .attr("stroke", "black");
+
+        diagram2.append("line")
+               .attr("x1", 250)
+               .attr("y1", 25)
+               .attr("x2", 60)
+               .attr("y2", 100)
+               .attr("stroke", "black");
+
+        diagram2.append("text")
+           .attr("x", 0)
+           .attr("y", 80)
+           .attr("fill", "black")
+           .text("100% match");
+
+
+        diagram2.append("text")
+           .attr("x", 240)
+           .attr("y", 80)
+           .attr("fill", "black")
+           .text("50% match");
+
+      </script>
+
+
+      <!-- <p> -->
+      <!--   Now, suppose there are two patient-donor pairs. Donor 1 and patient -->
+      <!--   1 have incompatible kidneys, but donor 2's kidney is compatible with -->
+      <!--   patient 1 and donor 1's kidney is compatible with patient 2's. A -->
+      <!--   <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">kidney exchange</a> -->
+      <!--   can then take place: patient 1 receives kidney 2, and patient 2 -->
+      <!--   receives kidney 1. -->
+      <!-- </p> -->
+
+       <!-- Imagine the kidney exchange problem on a national scale. There are currently -->
+       <!--  <a href="http://www.unos.org/">70,000 patients</a> waiting on kidneys -->
+       <!--  in the US. -->
+
+      <p>According to the <a href="http://www.nytimes.com/2015/05/03/magazine/the-great-american-kidney-swap.html">New York Times</a>, last year in the United States more than 500 kidneys were
+        transplanted through these paired exchange programs.
+      </p>
+
+      <p>
+        Furthermore, kidney exchanges need not be between two
+        patient-donor pairs. We could form longer cycles. For example,
+        with donor 1 giving to patient 2, donor 2 giving to patient 3,
+        and donor 3 giving to patient 1. Longer cycles with even more
+        patients are also possible.
+        </p>
+
+      <p>
+        However, there are issues with longer cycles. In a longer
+        cycle more people are affected if an exchange fails. In
+        addition, if all transplants are done simultaneously (to avoid
+        donors backing out once their partner has received a kidney),
+        more medical staff and operating rooms are required with
+        longer cycles.  Therefore, in this example, we restrict the
+        number of donor/recipient pairs in a cycle to be at most 3.
       </p>
 
 
-      <p>
-        Imagine the kidney exchange problem on a national scale. There are currently
-        <a href="http://www.unos.org/">70,000 patients</a> waiting on kidneys
-        in the US. Using kidney exchange, the number of deaths related to
-        kidney disease could be significantly reduced.
-      </p>
-
-      <p>
-        Furthermore, kidney exchanges need not be between two patient-donor
-        pairs. We could, for example, transplant kidney 1 on patient 2, kidney
-        2 on patient 3 and kidney 3 on patient 1. Longer cycles with even more
-        patients could be possible, although this is usually not the case in
-        practice, for various reasons. For example, if an exchange fails, more
-        people would be affected for longer cycles. In addition, all transplants
-        must be done simultaneously (otherwise donors could back out after their
-        partner has received a kidney), so longer cycles would require more
-        medical staff to be at the hospital at the same time. Therefore, in
-        practice, the number of donor/recipient pairs in a cycle should be at
-        most 3.
-      </p>
-
-      <p>
-        In summary, we are required to find the set of cycles, of length at
-        most 3, which maximizes the number of patients receiving an appropriate
-        kidney.
+      <p>The kidney exchange problem is then: given a set of donor-recipient
+        pairs with differing compatibility, find a set of cycles, of
+        length at most 3, that maximizes the number of patients receiving
+        a compatiable kidney.
       </p>
 
     </div>
