@@ -91,26 +91,28 @@ table, th, td {
 
       <p>According to
         the <a href="http://www.nytimes.com/2015/05/03/magazine/the-great-american-kidney-swap.html">
-        New York Times</a>, in the United States alone there are more
-        than 100,000 people with renal disease waiting to receive a
-        kidney. Patients typically wait four to five years before a
-        transplant. And last year, in 2014, more than 4,000 people
+        New York Times</a>, in the United States there are more than
+        100,000 people, on the transplant list, waiting for a kidney.
+        Patients typically wait four to five years before a
+        transplant. In 2014, more than 4,000 people
         died while waiting on the transplant list.
       </p>
 
       <p>New software and algorithms, many of them based on integer
         programming, have recently been developed to better match
-        patients with donors. These matchings are based on swapping
-        kidneys.
+        patients with donors. In this example, we will see how
+        an integer programming model based on exchanging kidneys
+        can help more transplants happen.
       </p>
 
       <p>
          Often a patient in need of a transplant has a friend or
         family member who is willing to donate their kidney. However,
-        because of differences in blood types and certain proteins in
-        the blood, the potential donor may be incompatiable with the
-        patient. Thus a transplant cannot be made, or the recipient
-        may have a high chance of rejecting the donor's kidney.
+        because of differences in blood types and proteins in the
+        blood, the potential donor may be incompatiable with the
+        patient. Thus a transplant cannot be made, or if the
+        transplant were to occur, the recipient would have a high chance
+        of rejecting the donor's kidney.
       </p>
 
       <p>In this example we consider four types of patients (donors
@@ -196,7 +198,7 @@ table, th, td {
       <p>The key to conducting a transplant in the presence of these
         incompatibilites, is doing
         a <a href="http://www.cs.cmu.edu/~sandholm/kidneyExchange.EC07.withGrantInfo.pdf">pair-exchange</a>,
-        also known as a kidney swap.
+        or a kidney swap.
       </p>
 
       <p>
@@ -206,7 +208,7 @@ table, th, td {
         we see that recipient 1 and donor 1 are incompatibale, and recipient
         2 and donor 2 are only 20% compatible. However, if recipient 1 were
         to receive a kidney from donor 2, they would be 50% compatiable. And
-        if recipient 2 were to receive a kidney from donor 2 they would be 100%
+        if recipient 2 were to receive a kidney from donor 1 they would be 100%
         compatiable.
         </p>
 
@@ -415,7 +417,7 @@ table, th, td {
       </p>
 
 
-      <p>The kidney exchange problem is then: given a set of donor-recipient
+      <p>The kidney exchange problem is then: given a set of donor/recipient
         pairs with differing compatibility, find a set of cycles, of
         length at most 3, that maximizes the number of patients receiving
         a compatiable kidney.
@@ -586,14 +588,16 @@ m.optimize()
 
       <p>
         Donor/recipient pairs are represented by nodes
-        <svg height="20" width="20">
+        <svg height="40" width="40">
           <defs>
             <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="50%" style="stop-color:#1f77b4;stop-opacity:1" />
               <stop offset="50%" style="stop-color:#ff7f0e;stop-opacity:1" />
             </linearGradient>
           </defs>
-          <circle cx="10" cy="10" r="8" stroke="black" stroke-width="2" fill="url(#grad1)" />
+          <circle cx="20" cy="20" r="18" stroke="black" stroke-width="2" fill="url(#grad1)" />
+          <text x="5" y="25" style="fill: white">D</text>
+          <text x="25" y="25" style="fill: white">R</text>
         </svg>
 
          where the color of the <em>left</em> side of the circle represents the type of the <em>donor</em>
